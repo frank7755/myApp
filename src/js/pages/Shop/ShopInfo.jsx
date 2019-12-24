@@ -1,10 +1,19 @@
 import React, { Fragment } from "react";
 import request from "~js/utils/request";
 import styles from "~css/Shop/ShopInfo.module.less";
-import { getProvince } from "~js/utils/address.js";
-import { Upload, Icon, Modal, Empty, Button, Form, Cascader } from "antd";
+import {
+  Upload,
+  Icon,
+  Modal,
+  Empty,
+  Button,
+  Form,
+  Cascader,
+  Select,
+  Input
+} from "antd";
 
-getProvince();
+const { Option } = Select;
 
 function getBase64(file) {
   return new Promise((resolve, reject) => {
@@ -102,6 +111,106 @@ class PicturesWall extends React.Component {
   }
 }
 
+class Address extends React.Component {
+  state = {
+    province: [],
+    city: [],
+    area: [],
+    provinceCode: null,
+    cityCode: null
+  };
+  componentDidMount() {
+    this.getProvince();
+  }
+
+  getProvince = () => {
+    request("http://114.67.90.231:8888/province", {
+      method: "post",
+      body: { id: this.props.id }
+    }).then(payload => {
+      this.setState({ province: payload });
+    });
+  };
+
+  getCity = provinceCode => {
+    request("http://114.67.90.231:8888/city", {
+      method: "post",
+      body: { provincecode: provinceCode }
+    }).then(payload => this.setState({ city: payload }));
+  };
+
+  getArea = cityCode => {
+    request("http://114.67.90.231:8888/area", {
+      method: "post",
+      body: { citycode: cityCode }
+    }).then(payload => this.setState({ area: payload }));
+  };
+
+  handleProvinceChange = province => {
+    this.getCity(province);
+    this.triggerChange({ province });
+  };
+  handleCityChange = city => {
+    this.getArea(city);
+    this.triggerChange({ city });
+  };
+  handleAreaChange = area => {
+    this.triggerChange({ area });
+  };
+
+  triggerChange = changedValue => {
+    const { onChange, value } = this.props;
+
+    if (onChange) {
+      onChange({
+        ...value,
+        ...changedValue
+      });
+    }
+  };
+
+  render() {
+    const { province, city, area } = this.state;
+    const { value } = this.props;
+    return (
+      <div>
+        <span className={styles.location}>
+          <Select value={value.province} onChange={this.handleProvinceChange}>
+            <Option value={-1}>省</Option>
+            {province &&
+              province.map(item => (
+                <Option key={item.provincecode} value={item.provincecode}>
+                  {item.name}
+                </Option>
+              ))}
+          </Select>
+          <Select value={value.city} onChange={this.handleCityChange}>
+            <Option value={-1}>市</Option>
+            {city &&
+              city.map(item => (
+                <Option key={item.citycode} value={item.citycode}>
+                  {item.name}
+                </Option>
+              ))}
+          </Select>
+          <Select value={value.area} onChange={this.handleAreaChange}>
+            <Option value={-1}>区</Option>
+            {area &&
+              area.map(item => (
+                <Option key={item.code} value={item.code}>
+                  {item.name}
+                </Option>
+              ))}
+          </Select>
+        </span>
+        <p>
+          <Input type="text" placeholder="请输入详细地址"></Input>
+        </p>
+      </div>
+    );
+  }
+}
+
 @Form.create()
 class AddShop extends React.Component {
   state = { visible: false };
@@ -126,9 +235,11 @@ class AddShop extends React.Component {
 
   render() {
     const { getFieldDecorator } = this.props.form;
+    const { id } = this.props;
+
     return (
       <Fragment>
-        <Button icon="plus-circle" type="primary">
+        <Button icon="plus-circle" type="primary" onClick={this.showModal}>
           我要开店
         </Button>
         <Modal
@@ -151,9 +262,10 @@ class AddShop extends React.Component {
               })(<Input placeholder="请输入门店简称" />)}
             </Form.Item>
             <Form.Item label="门店地址">
-              {getFieldDecorator("shop_jc", {
-                rules: [{ required: true, message: "请输入门店简称!" }]
-              })(<Input placeholder="请输入门店简称" />)}
+              {getFieldDecorator("location", {
+                initialValue: { province: -1, city: -1, area: -1 },
+                rules: [{ required: true, message: "请选择省份!" }]
+              })(<Address id={id}></Address>)}
             </Form.Item>
           </Form>
         </Modal>
@@ -177,6 +289,7 @@ export default class App extends React.Component {
   }
   render() {
     const { userInfo } = this.state;
+    const { id } = this.props;
 
     return (
       <div className={styles.shop}>
@@ -196,9 +309,7 @@ export default class App extends React.Component {
         ) : (
           <div className={styles.noData}>
             <h2>
-              <Button icon="plus-circle" type="primary">
-                我要开店
-              </Button>
+              <AddShop id={id}></AddShop>
             </h2>
             <div className={styles.empty}>
               <Empty
