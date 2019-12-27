@@ -15,6 +15,9 @@ export default {
   "/shopinfo": {
     component: loadable(() => import("~js/pages/Shop/ShopInfo.jsx"))
   },
+  "/staffmanage": {
+    component: loadable(() => import("~js/pages/Shop/StaffManage.jsx"))
+  },
   "/goodscategories": {
     component: loadable(() => import("~js/pages/Goods/GoodsCategories.jsx"))
   },

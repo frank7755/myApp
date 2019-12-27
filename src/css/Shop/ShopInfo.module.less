@@ -1,14 +1,24 @@
+@import "../common.less";
 .shop {
   padding: 24px;
   background-color: #fff;
-  h2 {
+  .shopTitle {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
     margin-bottom: 20px;
     color: rgba(0, 0, 0, 0.85);
     font-weight: bold;
     font-size: 16px;
-    line-height: 1.5;
+    border-bottom: 1px solid #e8e8e8;
+    padding: 5px 0;
+    > span {
+      height: auto;
+      line-height: 1.5;
+      border-left: 3px solid @primary-color;
+      padding-left: 10px;
+    }
   }
-
   .userInfo {
     display: flex;
     justify-content: space-between;

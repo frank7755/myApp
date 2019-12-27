@@ -8,9 +8,10 @@ import {
   Empty,
   Button,
   Form,
-  Cascader,
+  message,
   Select,
-  Input
+  Input,
+  Spin
 } from "antd";
 
 const { Option } = Select;
@@ -116,11 +117,23 @@ class Address extends React.Component {
     province: [],
     city: [],
     area: [],
-    provinceCode: null,
-    cityCode: null
+    value: this.props.value
+      ? this.props.value
+      : { province: -1, city: -1, area: -1, address: "" }
   };
+
   componentDidMount() {
     this.getProvince();
+    this.getCity(this.props.value.province);
+    this.getArea(this.props.value.city);
+  }
+
+  componentDidUpdate({ value: prevValue }) {
+    const { value } = this.props;
+    console.log(this.props.value);
+
+    prevValue.province !== value.province && this.getCity(value.province);
+    prevValue.city !== value.city && this.getArea(value.city);
   }
 
   getProvince = () => {
@@ -133,50 +146,73 @@ class Address extends React.Component {
   };
 
   getCity = provinceCode => {
-    request("http://114.67.90.231:8888/city", {
-      method: "post",
-      body: { provincecode: provinceCode }
-    }).then(payload => this.setState({ city: payload }));
+    provinceCode != -1 &&
+      request("http://114.67.90.231:8888/city", {
+        method: "post",
+        body: { provincecode: provinceCode }
+      }).then(payload => this.setState({ city: payload }));
   };
 
   getArea = cityCode => {
-    request("http://114.67.90.231:8888/area", {
-      method: "post",
-      body: { citycode: cityCode }
-    }).then(payload => this.setState({ area: payload }));
+    cityCode != -1 &&
+      request("http://114.67.90.231:8888/area", {
+        method: "post",
+        body: { citycode: cityCode }
+      }).then(payload => this.setState({ area: payload }));
   };
 
   handleProvinceChange = province => {
+    const { value } = this.state;
+    const nextValue = { ...value, province, city: -1, area: -1 };
+
     this.getCity(province);
-    this.triggerChange({ province });
+    this.setState({ value: nextValue, city: [], area: [] });
+    province !== value.province && this.triggerChange(nextValue);
   };
+
   handleCityChange = city => {
+    const { value } = this.state;
+    const nextValue = { ...value, city, area: -1 };
+
     this.getArea(city);
-    this.triggerChange({ city });
+    this.setState({ value: nextValue, area: [] });
+    city !== value.city && this.triggerChange(nextValue);
   };
+
   handleAreaChange = area => {
-    this.triggerChange({ area });
+    const { value } = this.state;
+    const nextValue = { ...value, area };
+
+    this.setState({ value: nextValue });
+    area !== value.area && this.triggerChange(nextValue);
   };
 
-  triggerChange = changedValue => {
-    const { onChange, value } = this.props;
+  handleaddress = e => {
+    const { value } = this.state;
+    const address = e.target.value;
 
-    if (onChange) {
-      onChange({
-        ...value,
-        ...changedValue
-      });
-    }
+    this.setState({ value: { ...value, address } });
+    this.triggerChange({ address });
+  };
+
+  triggerChange = value => {
+    const { onChange } = this.props;
+
+    onChange && onChange(value);
   };
 
   render() {
-    const { province, city, area } = this.state;
-    const { value } = this.props;
+    const { province, city, area, value } = this.state;
+
     return (
       <div>
         <span className={styles.location}>
-          <Select value={value.province} onChange={this.handleProvinceChange}>
-            <Option value={-1}>省</Option>
+          <Select
+            value={value.province}
+            placeholder="省"
+            onChange={this.handleProvinceChange}
+          >
+            <Option value={-1}>请选择</Option>
             {province &&
               province.map(item => (
                 <Option key={item.provincecode} value={item.provincecode}>
@@ -184,8 +220,12 @@ class Address extends React.Component {
                 </Option>
               ))}
           </Select>
-          <Select value={value.city} onChange={this.handleCityChange}>
-            <Option value={-1}>市</Option>
+          <Select
+            value={value.city}
+            placeholder="市"
+            onChange={this.handleCityChange}
+          >
+            <Option value={-1}>请选择</Option>
             {city &&
               city.map(item => (
                 <Option key={item.citycode} value={item.citycode}>
@@ -193,8 +233,12 @@ class Address extends React.Component {
                 </Option>
               ))}
           </Select>
-          <Select value={value.area} onChange={this.handleAreaChange}>
-            <Option value={-1}>区</Option>
+          <Select
+            value={value.area}
+            placeholder="区"
+            onChange={this.handleAreaChange}
+          >
+            <Option value={-1}>请选择</Option>
             {area &&
               area.map(item => (
                 <Option key={item.code} value={item.code}>
@@ -204,7 +248,12 @@ class Address extends React.Component {
           </Select>
         </span>
         <p>
-          <Input type="text" placeholder="请输入详细地址"></Input>
+          <Input
+            onChange={this.handleaddress}
+            type="text"
+            value={value.address}
+            placeholder="请输入详细地址"
+          ></Input>
         </p>
       </div>
     );
@@ -212,7 +261,7 @@ class Address extends React.Component {
 }
 
 @Form.create()
-class AddShop extends React.Component {
+class ShopManage extends React.Component {
   state = { visible: false };
 
   showModal = () => {
@@ -221,9 +270,42 @@ class AddShop extends React.Component {
     });
   };
 
-  handleOk = e => {
-    this.setState({
-      visible: false
+  handleAddOk = e => {
+    this.props.form.validateFields((error, values) => {
+      if (!error) {
+        const { location, ...rest } = values;
+
+        request("http://114.67.90.231:8888/create_shop", {
+          method: "post",
+          body: { ...rest, ...location, id: this.props.id }
+        }).then(payload => {
+          this.setState({
+            visible: false
+          });
+          this.props.refresh();
+        });
+      }
+    });
+  };
+
+  handleEditOk = e => {
+    this.props.form.validateFields((error, values) => {
+      console.log(values);
+      if (!error) {
+        const { location, ...rest } = values;
+
+        request("http://114.67.90.231:8888/update_shop", {
+          method: "post",
+          body: { ...rest, ...location, id: this.props.id }
+        })
+          .then(payload => {
+            this.setState({
+              visible: false
+            });
+            this.props.refresh();
+          })
+          .catch(err => message.error(err.message));
+      }
     });
   };
 
@@ -235,17 +317,23 @@ class AddShop extends React.Component {
 
   render() {
     const { getFieldDecorator } = this.props.form;
-    const { id } = this.props;
+    const { id, type, data } = this.props;
 
     return (
       <Fragment>
-        <Button icon="plus-circle" type="primary" onClick={this.showModal}>
-          我要开店
-        </Button>
+        {type == "add" ? (
+          <Button icon="plus" type="primary" onClick={this.showModal}>
+            我要开店
+          </Button>
+        ) : (
+          <Button icon="edit" type="primary" onClick={this.showModal}>
+            编辑
+          </Button>
+        )}
         <Modal
-          title="我要开店"
+          title={type == "add" ? "我要开店" : "编辑"}
           visible={this.state.visible}
-          onOk={this.handleOk}
+          onOk={type == "add" ? this.handleAddOk : this.handleEditOk}
           onCancel={this.handleCancel}
           okText="确定"
           cancelText="取消"
@@ -253,18 +341,42 @@ class AddShop extends React.Component {
           <Form onSubmit={this.handleSubmit}>
             <Form.Item label="门店名称">
               {getFieldDecorator("shop_name", {
+                initialValue: data && data.shop_name,
                 rules: [{ required: true, message: "请输入门店名称!" }]
               })(<Input placeholder="请输入门店名称" />)}
             </Form.Item>
-            <Form.Item label="简称">
+            <Form.Item label="门店简称">
               {getFieldDecorator("shop_jc", {
+                initialValue: data && data.shop_jc,
                 rules: [{ required: true, message: "请输入门店简称!" }]
               })(<Input placeholder="请输入门店简称" />)}
             </Form.Item>
             <Form.Item label="门店地址">
               {getFieldDecorator("location", {
-                initialValue: { province: -1, city: -1, area: -1 },
-                rules: [{ required: true, message: "请选择省份!" }]
+                initialValue: data && {
+                  province: data.province_code,
+                  city: data.city_code,
+                  area: data.area_code,
+                  address: data.address
+                },
+                rules: [
+                  {
+                    required: true,
+                    validator: (_rule, value, callback) => {
+                      if (
+                        value == null ||
+                        value.province == null ||
+                        value.city == null ||
+                        value.area == null ||
+                        value.address == null
+                      ) {
+                        callback("请输入完整地址！");
+                      } else {
+                        callback();
+                      }
+                    }
+                  }
+                ]
               })(<Address id={id}></Address>)}
             </Form.Item>
           </Form>
@@ -276,26 +388,45 @@ class AddShop extends React.Component {
 
 export default class App extends React.Component {
   state = {
+    loading: false,
     userInfo: null
   };
 
   componentDidMount() {
+    this.refresh();
+  }
+
+  refresh = () => {
+    this.setState({ loading: true });
     request(`http://114.67.90.231:8888/select_shop`, {
       method: "POST",
       body: {
         id: this.props.id
       }
-    }).then(payload => this.setState({ userInfo: payload }));
-  }
+    })
+      .then(payload => this.setState({ userInfo: payload, loading: false }))
+      .catch(error => {
+        message.error(error.message);
+        this.setState({ loading: false });
+      });
+  };
+
   render() {
-    const { userInfo } = this.state;
+    const { userInfo, loading } = this.state;
     const { id } = this.props;
 
     return (
       <div className={styles.shop}>
         {userInfo ? (
-          <Fragment>
-            <h2>门店信息</h2>
+          <Spin spinning={loading} delay={150}>
+            <h2 className="title">
+              <span>门店信息</span>
+              <ShopManage
+                data={userInfo}
+                refresh={this.refresh}
+                id={id}
+              ></ShopManage>
+            </h2>
             <ul className={styles.userInfo}>
               <li>门店名称：{userInfo.shop_name}</li>
               <li>门店简称：{userInfo.shop_jc}</li>
@@ -305,19 +436,25 @@ export default class App extends React.Component {
                 <p></p>
               </li>
             </ul>
-          </Fragment>
+          </Spin>
         ) : (
-          <div className={styles.noData}>
-            <h2>
-              <AddShop id={id}></AddShop>
-            </h2>
-            <div className={styles.empty}>
-              <Empty
-                image={Empty.PRESENTED_IMAGE_SIMPLE}
-                description="暂无店铺信息"
-              />
+          !loading && (
+            <div className={styles.noData}>
+              <h2>
+                <ShopManage
+                  type="add"
+                  refresh={this.refresh}
+                  id={id}
+                ></ShopManage>
+              </h2>
+              <div className={styles.empty}>
+                <Empty
+                  image={Empty.PRESENTED_IMAGE_SIMPLE}
+                  description="暂无店铺信息"
+                />
+              </div>
             </div>
-          </div>
+          )
         )}
       </div>
     );

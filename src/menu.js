@@ -117,7 +117,7 @@ export default [
       {
         key: 102,
         title: "店员管理",
-        src: "/shopmanage"
+        src: "/staffmanage"
       },
       {
         key: 103,

@@ -26,6 +26,7 @@ const ModuleNotFoundPlugin = require("react-dev-utils/ModuleNotFoundPlugin");
 const ForkTsCheckerWebpackPlugin = require("react-dev-utils/ForkTsCheckerWebpackPlugin");
 const typescriptFormatter = require("react-dev-utils/typescriptFormatter");
 // const eslint = require("eslint");
+const theme = require("../theme");
 
 const postcssNormalize = require("postcss-normalize");
 
@@ -121,20 +122,17 @@ module.exports = function(webpackEnv) {
       }
     ].filter(Boolean);
     if (preProcessor) {
-      loaders.push(
-        {
-          loader: require.resolve("resolve-url-loader"),
+      let loader = require.resolve(preProcessor);
+      if (preProcessor === "less-loader") {
+        loader = {
+          loader,
           options: {
-            sourceMap: isEnvProduction && shouldUseSourceMap
+            modifyVars: theme,
+            javascriptEnabled: true
           }
-        },
-        {
-          loader: require.resolve(preProcessor),
-          options: {
-            sourceMap: true
-          }
-        }
-      );
+        };
+      }
+      loaders.push(loader);
     }
     return loaders;
   };
@@ -491,29 +489,29 @@ module.exports = function(webpackEnv) {
               )
             },
             {
-                test: lessRegex,
-                exclude: lessModuleRegex,
-                use: getStyleLoaders(
-                  {
-                    importLoaders: 2,
-                    sourceMap: isEnvProduction && shouldUseSourceMap
-                  },
-                  "less-loader"
-                ),
-                sideEffects: true
-              },
-              {
-                test: lessModuleRegex,
-                use: getStyleLoaders(
-                  {
-                    importLoaders: 2,
-                    sourceMap: isEnvProduction && shouldUseSourceMap,
-                    modules: true,
-                    getLocalIdent: getCSSModuleLocalIdent
-                  },
-                  "less-loader"
-                )
-              },
+              test: lessRegex,
+              exclude: lessModuleRegex,
+              use: getStyleLoaders(
+                {
+                  importLoaders: 2,
+                  sourceMap: isEnvProduction && shouldUseSourceMap
+                },
+                "less-loader"
+              ),
+              sideEffects: true
+            },
+            {
+              test: lessModuleRegex,
+              use: getStyleLoaders(
+                {
+                  importLoaders: 2,
+                  sourceMap: isEnvProduction && shouldUseSourceMap,
+                  modules: true,
+                  getLocalIdent: getCSSModuleLocalIdent
+                },
+                "less-loader"
+              )
+            },
             // "file" loader makes sure those assets get served by WebpackDevServer.
             // When you `import` an asset, you get its (virtual) filename.
             // In production, they would get copied to the `build` folder.

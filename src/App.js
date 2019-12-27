@@ -1,4 +1,4 @@
-import "~css/reset-pc.css";
+import "~css/reset-pc.less";
 import React, { Fragment } from "react";
 import {
   HashRouter as Router,

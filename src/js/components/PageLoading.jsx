@@ -1,9 +1,6 @@
 import React from 'react';
 import { Spin } from 'antd';
-import { Redirect } from 'react-router-dom';
-
-// ANSI Regexp
-const ANSI_REGEX = /[\u001B\u009B][[\]()#;?]*(?:(?:(?:[a-zA-Z\d]*(?:;[a-zA-Z\d]*)*)?\u0007)|(?:(?:\d{1,4}(?:;\d{0,4})*)?[\dA-PRZcf-ntqry=><~]))/g;
+import { Redirect } from 'react-router';
 
 /**
  * @function PageLoading
@@ -13,6 +10,9 @@ export default function PageLoading({ error, timedOut, pastDelay }) {
   // When the loader has errored
   if (error) {
     if (process.env.DEBUG) {
+      // ANSI Regexp
+      const ANSI_REGEX = /[\u001B\u009B][[\]()#;?]*(?:(?:(?:[a-zA-Z\d]*(?:;[a-zA-Z\d]*)*)?\u0007)|(?:(?:\d{1,4}(?:;\d{0,4})*)?[\dA-PRZcf-ntqry=><~]))/g;
+
       return (
         <pre
           style={{
@@ -34,7 +34,7 @@ export default function PageLoading({ error, timedOut, pastDelay }) {
       );
     }
 
-    return <Redirect to="/404" />;
+    return <Redirect to="/500" />;
   }
 
   // When the loader taken longer than the timeout
@@ -46,7 +46,7 @@ export default function PageLoading({ error, timedOut, pastDelay }) {
   if (pastDelay) {
     return (
       <Spin>
-        <div style={{ width: '100%', height: 360 }} />
+        <div style={{ minHeight: 360 }} />
       </Spin>
     );
   }
