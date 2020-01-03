@@ -90,7 +90,6 @@ class ChangeModal extends React.Component {
   };
 
   handleCancel = e => {
-    console.log(e);
     this.setState({
       visible: false
     });
@@ -162,8 +161,7 @@ class ChangeModal extends React.Component {
 
 export default class App extends React.Component {
   state = {
-    data: [],
-    autoExpandParent: true
+    data: []
   };
 
   refresh = () => {
@@ -267,13 +265,7 @@ export default class App extends React.Component {
             data={data}
           ></ChangeModal>
         </h2>
-        <Tree
-          onExpand={this.onExpand}
-          expandedKeys={this.state.expandedKeys}
-          autoExpandParent={this.state.autoExpandParent}
-        >
-          {this.renderTreeNodes(data)}
-        </Tree>
+        {data && <Tree blockNode>{this.renderTreeNodes(data)}</Tree>}
       </div>
     );
   }

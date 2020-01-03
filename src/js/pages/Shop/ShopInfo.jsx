@@ -124,16 +124,24 @@ class Address extends React.Component {
 
   componentDidMount() {
     this.getProvince();
-    this.getCity(this.props.value.province);
-    this.getArea(this.props.value.city);
+
+    const { value } = this.props;
+
+    if (value) {
+      this.getCity(value.province);
+      this.getArea(value.city);
+    }
   }
 
   componentDidUpdate({ value: prevValue }) {
     const { value } = this.props;
-    console.log(this.props.value);
 
-    prevValue.province !== value.province && this.getCity(value.province);
-    prevValue.city !== value.city && this.getArea(value.city);
+    if (value) {
+      //   console.log(prevValue.province, value.province);
+      (!prevValue || prevValue.province !== value.province) &&
+        this.getCity(value.province);
+      (!prevValue || prevValue.city !== value.city) && this.getArea(value.city);
+    }
   }
 
   getProvince = () => {
@@ -146,7 +154,8 @@ class Address extends React.Component {
   };
 
   getCity = provinceCode => {
-    provinceCode != -1 &&
+    provinceCode &&
+      provinceCode != -1 &&
       request("http://114.67.90.231:8888/city", {
         method: "post",
         body: { provincecode: provinceCode }
@@ -154,7 +163,8 @@ class Address extends React.Component {
   };
 
   getArea = cityCode => {
-    cityCode != -1 &&
+    cityCode &&
+      cityCode != -1 &&
       request("http://114.67.90.231:8888/area", {
         method: "post",
         body: { citycode: cityCode }

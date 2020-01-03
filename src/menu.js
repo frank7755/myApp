@@ -24,7 +24,8 @@ export default [
     children: [
       {
         key: 301,
-        title: "货单管理"
+        title: "货单管理",
+        src:'/ordermanage'
       },
       {
         key: 302,
@@ -47,7 +48,7 @@ export default [
       {
         key: 402,
         title: "商品分类",
-        src: "goodscategories"
+        src: "/goodscategories"
       }
     ]
   },

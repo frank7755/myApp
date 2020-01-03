@@ -35,13 +35,19 @@ export default class App extends React.Component {
           <Route
             render={props => (
               <HasLayoutPages history={history}>
-                {id => (
+                {(id, username) => (
                   <Switch>
                     {LayoutPages.map(
                       ({ component: Component, ...restProps }) => (
                         <Route
                           {...restProps}
-                          render={props => <Component id={id} {...props} />}
+                          render={props => (
+                            <Component
+                              id={id}
+                              user_name={username}
+                              {...props}
+                            />
+                          )}
                         />
                       )
                     )}

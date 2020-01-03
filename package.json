@@ -1,6 +1,7 @@
 {
   "name": "yybs",
   "version": "0.1.0",
+  "homepage": "https://github.com/frank7755/myApp.git",
   "private": true,
   "dependencies": {
     "@babel/core": "7.6.0",

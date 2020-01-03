@@ -95,7 +95,7 @@ export default class App extends React.Component {
               overflow: "initial"
             }}
           >
-            {this.props.children(info.id)}
+            {this.props.children(info.id, info.user_name, info.telnumber)}
           </Content>
         </Layout>
       </Layout>

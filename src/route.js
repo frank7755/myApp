@@ -21,6 +21,9 @@ export default {
   "/goodscategories": {
     component: loadable(() => import("~js/pages/Goods/GoodsCategories.jsx"))
   },
+  "/ordermanage": {
+    component: loadable(() => import("~js/pages/Purchase/OrderManage.jsx"))
+  },
   // 错误页
   "/403": {
     layout: false,

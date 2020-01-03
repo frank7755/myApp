@@ -30,12 +30,29 @@ class GuideStaffTable extends React.Component {
               data={record}
             ></StaffInfo>
             <Divider type="vertical"></Divider>
-            <a className="textDelete">删除</a>
+            <a
+              className="textDelete"
+              onClick={() => this.handleDelete(record.staff_id)}
+            >
+              删除
+            </a>
           </Fragment>
         );
       }
     }
   ];
+
+  handleDelete = id => {
+    request("http://114.67.90.231:8888/delete_employess", {
+      method: "post",
+      body: {
+        id: this.props.id,
+        staff_id: id
+      }
+    })
+      .then(payload => this.refresh())
+      .catch(error => message.error(error.message));
+  };
 
   refresh = () => {
     const { table } = this.props;
@@ -84,37 +101,37 @@ class StaffInfo extends React.Component {
   };
 
   handleAddOk = e => {
-    this.props.form
-      .validateFields((error, values) => {
-        if (!error) {
-          request("http://114.67.90.231:8888/create_employess", {
-            method: "post",
-            body: { ...values, id: this.props.id }
-          }).then(() => {
+    this.props.form.validateFields((error, values) => {
+      if (!error) {
+        request("http://114.67.90.231:8888/create_employess", {
+          method: "post",
+          body: { ...values, id: this.props.id }
+        })
+          .then(() => {
             this.props.refresh();
 
             this.setState({ visible: false });
-          });
-        }
-      })
-      .catch(err => message.error(err.message));
+          })
+          .catch(err => message.error(err.message));
+      }
+    });
   };
 
   handleEditOk = e => {
-    this.props.form
-      .validateFields((error, values) => {
-        if (!error) {
-          request("http://114.67.90.231:8888/update_employess", {
-            method: "post",
-            body: { ...values, id: this.props.id }
-          }).then(() => {
+    this.props.form.validateFields((error, values) => {
+      if (!error) {
+        request("http://114.67.90.231:8888/update_employess", {
+          method: "post",
+          body: { ...values, id: this.props.id }
+        })
+          .then(() => {
             this.props.refresh();
 
             this.setState({ visible: false });
-          });
-        }
-      })
-      .catch(err => message.error(err.message));
+          })
+          .catch(err => message.error(err.message));
+      }
+    });
   };
 
   handleCancel = e => {
@@ -158,7 +175,12 @@ class StaffInfo extends React.Component {
               {getFieldDecorator("staff_id", {
                 initialValue: data && data.staff_id,
                 rules: [{ required: true, message: "请输入员工编号!" }]
-              })(<Input placeholder="请输入员工编号" />)}
+              })(
+                <Input
+                  disabled={type == "add" ? false : true}
+                  placeholder="请输入员工编号"
+                />
+              )}
             </Form.Item>
           </Form>
         </Modal>
@@ -174,7 +196,6 @@ export default class App extends React.Component {
         id={this.props.id}
         source="http://114.67.90.231:8888/select_employess"
         prefetch
-        preload
         query={{ id: this.props.id }}
       ></GuideStaffTable>
     );
