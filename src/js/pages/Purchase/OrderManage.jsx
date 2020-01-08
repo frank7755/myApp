@@ -64,7 +64,6 @@ class GoodsDrawer extends React.PureComponent {
         !data && GoodsDrawer.expando++;
 
         this.setState({ visible: false });
-        console.log(String(key), " - ", String(GoodsDrawer.expando));
 
         onChange && onChange({ ...values, key });
         form.resetFields();
@@ -352,7 +351,10 @@ class OrderTable extends React.Component {
     {
       title: "进货单号",
       dataIndex: "code_id",
-      width: 200
+      width: 200,
+      render(orderID) {
+        return <a href={`#/ordermanage/${orderID}`}>{orderID}</a>;
+      }
     },
     {
       title: "进货日期",
@@ -375,9 +377,21 @@ class OrderTable extends React.Component {
     {
       title: "进货金额",
       dataIndex: "purchase_price",
-      width: 300,
+      width: 250,
       render(purchase_price) {
         return `￥ ${formatThousands(purchase_price)}`;
+      }
+    },
+    {
+      title: "货单状态",
+      dataIndex: "status",
+      width: 150,
+      render(status) {
+        return status == 1 ? (
+          <Tag color="orange">已作废</Tag>
+        ) : (
+          <Tag color="green">正常</Tag>
+        );
       }
     },
     {

@@ -25,15 +25,17 @@ export default [
       {
         key: 301,
         title: "货单管理",
-        src:'/ordermanage'
+        src: "/ordermanage"
       },
       {
         key: 302,
-        title: "供应商管理"
+        title: "供应商管理",
+        src: "/supplier"
       },
       {
         key: 303,
-        title: "应付账款"
+        title: "应付账款",
+        src: "/ordertopay"
       }
     ]
   },
@@ -58,7 +60,8 @@ export default [
     children: [
       {
         key: 501,
-        title: "会员管理"
+        title: "会员管理",
+        src: "/vipmanage"
       }
     ]
   },

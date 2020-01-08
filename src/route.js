@@ -24,6 +24,18 @@ export default {
   "/ordermanage": {
     component: loadable(() => import("~js/pages/Purchase/OrderManage.jsx"))
   },
+  "/ordermanage/:id": {
+    component: loadable(() => import("~js/pages/Purchase/OrderDetails.jsx"))
+  },
+  "/supplier": {
+    component: loadable(() => import("~js/pages/Purchase/Supplier.jsx"))
+  },
+  "/ordertopay": {
+    component: loadable(() => import("~js/pages/Purchase/OrderToPay.jsx"))
+  },
+  "/vipmanage": {
+    component: loadable(() => import("~js/pages/Vip/VipManage.jsx"))
+  },
   // 错误页
   "/403": {
     layout: false,
