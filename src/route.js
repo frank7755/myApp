@@ -18,6 +18,9 @@ export default {
   "/staffmanage": {
     component: loadable(() => import("~js/pages/Shop/StaffManage.jsx"))
   },
+  "/goodsmanage": {
+    component: loadable(() => import("~js/pages/Goods/GoodsManage.jsx"))
+  },
   "/goodscategories": {
     component: loadable(() => import("~js/pages/Goods/GoodsCategories.jsx"))
   },
@@ -35,6 +38,9 @@ export default {
   },
   "/vipmanage": {
     component: loadable(() => import("~js/pages/Vip/VipManage.jsx"))
+  },
+  "/cashcenter": {
+    component: loadable(() => import("~js/pages/Cash/CashCenter.jsx"))
   },
   // 错误页
   "/403": {

@@ -1,14 +1,9 @@
-import "~css/reset-pc.less";
-import React, { Fragment } from "react";
-import {
-  HashRouter as Router,
-  Route,
-  Switch,
-  Redirect
-} from "react-router-dom";
-import routes from "./route";
-import { history } from "~js/utils/utils";
-import HasLayoutPages from "~js/components/HasLayoutPages/Index";
+import '~css/reset-pc.less';
+import React, { Fragment } from 'react';
+import { HashRouter as Router, Route, Switch, Redirect } from 'react-router-dom';
+import routes from './route';
+import { history } from '~js/utils/utils';
+import HasLayoutPages from '~js/components/HasLayoutPages/Index';
 
 const NoLayoutPages = [];
 const LayoutPages = [];
@@ -37,20 +32,9 @@ export default class App extends React.Component {
               <HasLayoutPages history={history}>
                 {(id, username) => (
                   <Switch>
-                    {LayoutPages.map(
-                      ({ component: Component, ...restProps }) => (
-                        <Route
-                          {...restProps}
-                          render={props => (
-                            <Component
-                              id={id}
-                              user_name={username}
-                              {...props}
-                            />
-                          )}
-                        />
-                      )
-                    )}
+                    {LayoutPages.map(({ component: Component, ...restProps }) => (
+                      <Route {...restProps} render={props => <Component id={id} user_name={username} {...props} />} />
+                    ))}
                     <Redirect to="/404"></Redirect>
                   </Switch>
                 )}
