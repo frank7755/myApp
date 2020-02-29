@@ -15,6 +15,11 @@ export default [
       {
         key: 803,
         title: '退货查询'
+      },
+      {
+        key: 804,
+        title: '线上订单查询',
+        src:'/onlineorder'
       }
     ]
   },
@@ -46,8 +51,13 @@ export default [
     children: [
       {
         key: 401,
-        title: '商品管理',
-        src: '/goodsmanage'
+        title: '商品查询',
+        src: '/goodssearch'
+      },
+      {
+        key: 403,
+        title: '商品添加',
+        src: '/goodsadd'
       },
       {
         key: 402,
@@ -138,7 +148,18 @@ export default [
       {
         key: 105,
         title: '权限管理',
-        src: 'authoritymanage'
+        src: '/authoritymanage'
+      }
+    ]
+  },
+  {
+    key: 2,
+    title: '素材',
+    children: [
+      {
+        key: 601,
+        title: '素材中心',
+        src: '/sourcecenter'
       }
     ]
   }

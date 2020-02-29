@@ -418,6 +418,7 @@ module.exports = function(webpackEnv) {
             // using the extension .module.css
             {
               test: cssModuleRegex,
+              exclude: /node_module/,
               use: getStyleLoaders({
                 importLoaders: 1,
                 sourceMap: isEnvProduction && shouldUseSourceMap,

@@ -1,0 +1,34 @@
+@import "../common.less";
+.orderAction {
+  padding: 24px 32px;
+  background-color: #fff;
+  .actionTop {
+    border: 1px solid #e8e8e8;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    .info {
+      padding: 24px;
+      width: 360px;
+      border-right: 1px solid #e8e8e8;
+      h2 {
+        font-size: 14px;
+        font-weight: bold;
+      }
+    }
+    .action {
+      flex: 1;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      > div {
+        h2 {
+          font-size: 14px;
+          font-weight: bold;
+          margin-bottom: 16px;
+        }
+        flex: 1;
+      }
+    }
+  }
+}

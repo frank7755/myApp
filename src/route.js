@@ -1,58 +1,74 @@
-import loadable from "~js/utils/loadable";
+import loadable from '~js/utils/loadable';
 
 /**
  * @namespace routes
  */
 export default {
   // 逻辑页
-  "/": {
-    component: loadable(() => import("~js/pages/Home.jsx"))
+  '/': {
+    component: loadable(() => import('~js/pages/Home.jsx'))
   },
-  "/:type(login|register)": {
+  '/:type(login|register)': {
     layout: false,
-    component: loadable(() => import("~js/pages/Login.jsx"))
+    component: loadable(() => import('~js/pages/Login.jsx'))
   },
-  "/shopinfo": {
-    component: loadable(() => import("~js/pages/Shop/ShopInfo.jsx"))
+  '/shopinfo': {
+    component: loadable(() => import('~js/pages/Shop/ShopInfo.jsx'))
   },
-  "/staffmanage": {
-    component: loadable(() => import("~js/pages/Shop/StaffManage.jsx"))
+  '/staffmanage': {
+    component: loadable(() => import('~js/pages/Shop/StaffManage.jsx'))
   },
-  "/goodsmanage": {
-    component: loadable(() => import("~js/pages/Goods/GoodsManage.jsx"))
+  '/goodsadd': {
+    component: loadable(() => import('~js/pages/Goods/GoodsAdd/Index.jsx'))
   },
-  "/goodscategories": {
-    component: loadable(() => import("~js/pages/Goods/GoodsCategories.jsx"))
+  '/goodssearch': {
+    component: loadable(() => import('~js/pages/Goods/GoodsSearch.jsx'))
   },
-  "/ordermanage": {
-    component: loadable(() => import("~js/pages/Purchase/OrderManage.jsx"))
+  '/goodscategories': {
+    component: loadable(() => import('~js/pages/Goods/GoodsCategories.jsx'))
   },
-  "/ordermanage/:id": {
-    component: loadable(() => import("~js/pages/Purchase/OrderDetails.jsx"))
+  '/ordermanage': {
+    component: loadable(() => import('~js/pages/Purchase/OrderManage.jsx'))
   },
-  "/supplier": {
-    component: loadable(() => import("~js/pages/Purchase/Supplier.jsx"))
+  '/ordermanage/:id': {
+    component: loadable(() => import('~js/pages/Purchase/OrderDetails.jsx'))
   },
-  "/ordertopay": {
-    component: loadable(() => import("~js/pages/Purchase/OrderToPay.jsx"))
+  '/supplier': {
+    component: loadable(() => import('~js/pages/Purchase/Supplier.jsx'))
   },
-  "/vipmanage": {
-    component: loadable(() => import("~js/pages/Vip/VipManage.jsx"))
+  '/ordertopay': {
+    component: loadable(() => import('~js/pages/Purchase/OrderToPay.jsx'))
   },
-  "/cashcenter": {
-    component: loadable(() => import("~js/pages/Cash/CashCenter.jsx"))
+  '/vipmanage': {
+    component: loadable(() => import('~js/pages/Vip/VipManage.jsx'))
   },
+  '/cashcenter': {
+    component: loadable(() => import('~js/pages/Cash/CashCenter.jsx'))
+  },
+  '/onlineorder': {
+    component: loadable(() => import('~js/pages/Cash/OnlineOrder.jsx'))
+  },
+  '/onlineorder/:id': {
+    component: loadable(() => import('~js/pages/Cash/OnlineOrderDetails.jsx'))
+  },
+  '/onlineorder/action/:id': {
+    component: loadable(() => import('~js/pages/Cash/OrderAction.jsx'))
+  },
+  '/sourcecenter': {
+    component: loadable(() => import('~js/pages/Upload/Index.jsx'))
+  },
+
   // 错误页
-  "/403": {
+  '/403': {
     layout: false,
-    component: loadable(() => import("~js/pages/403.jsx"))
+    component: loadable(() => import('~js/pages/403.jsx'))
   },
-  "/404": {
+  '/404': {
     layout: false,
-    component: loadable(() => import("~js/pages/404.jsx"))
+    component: loadable(() => import('~js/pages/404.jsx'))
   },
-  "/500": {
+  '/500': {
     layout: false,
-    component: loadable(() => import("~js/pages/500.jsx"))
+    component: loadable(() => import('~js/pages/500.jsx'))
   }
 };

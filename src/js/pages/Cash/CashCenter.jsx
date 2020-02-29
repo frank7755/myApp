@@ -322,7 +322,6 @@ class EditableTable extends React.Component {
 
   onSelect = value => {
     const { GoodsSource, data } = this.state;
-
     if (data.length) {
       data.every(item => item.goods_id != value)
         ? this.setState({
@@ -347,7 +346,7 @@ class EditableTable extends React.Component {
       });
     }
     this.setState({ GoodsSource: [] });
-    // console.log(data);
+    console.log(data);
   };
 
   hangup = () => {
@@ -402,6 +401,8 @@ class EditableTable extends React.Component {
         }
       };
     });
+
+    console.log(this.state.data);
 
     data.length &&
       data.forEach(item => {

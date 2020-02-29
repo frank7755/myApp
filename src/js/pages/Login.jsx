@@ -3,6 +3,7 @@ import styles from "~css/login.module.less";
 import { Form, Icon, Input, Button, Checkbox, message, Avatar } from "antd";
 import request from "~js/utils/request";
 import { store } from "~js/utils/utils";
+import { history } from '~js/utils/utils';
 import { Link } from "react-router-dom";
 
 @Form.create()
