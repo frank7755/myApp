@@ -1,9 +1,9 @@
 import React, { Fragment } from 'react';
 import styles from '~css/Goods/GoodsAdd/Real.module.less';
 import { Form, Input, Select, Upload, Icon, Modal, Button, Table, Row, Col } from 'antd';
-import BraftEditor from 'braft-editor';
-// 引入编辑器样式
-import 'braft-editor/dist/index.css';
+// import BraftEditor from 'braft-editor';
+// // 引入编辑器样式
+// import 'braft-editor/dist/index.css';
 
 const FormItem = Form.Item;
 const { Option } = Select;

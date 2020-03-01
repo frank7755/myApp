@@ -402,8 +402,6 @@ class EditableTable extends React.Component {
       };
     });
 
-    console.log(this.state.data);
-
     data.length &&
       data.forEach(item => {
         sumCount += +item.count;

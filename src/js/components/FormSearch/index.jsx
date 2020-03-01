@@ -29,6 +29,7 @@ export default class FormSearch extends React.PureComponent {
     const { form, onSearch, onInvalid } = this.props;
 
     form.validateFields((error, values) => {
+      console.log(values);
       if (error) {
         onInvalid && onInvalid(error, values);
       } else {
