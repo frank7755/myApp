@@ -10,41 +10,37 @@ export default [
       },
       {
         key: 802,
-        title: '销售查询'
+        title: '销售查询',
+        src: '/sellsearch'
       },
       {
         key: 803,
-        title: '退货查询'
-      },
-      {
-        key: 804,
         title: '线上订单查询',
-        src:'/onlineorder'
+        src: '/onlineorder'
       }
     ]
   },
-
-  {
-    key: 3,
-    title: '采购',
-    children: [
-      {
-        key: 301,
-        title: '货单管理',
-        src: '/ordermanage'
-      },
-      {
-        key: 302,
-        title: '供应商管理',
-        src: '/supplier'
-      },
-      {
-        key: 303,
-        title: '应付账款',
-        src: '/ordertopay'
-      }
-    ]
-  },
+  // {
+  //   key: 3,
+  //   title: '采购',
+  //   children: [
+  //     {
+  //       key: 301,
+  //       title: '货单管理',
+  //       src: '/ordermanage'
+  //     },
+  //     {
+  //       key: 302,
+  //       title: '供应商管理',
+  //       src: '/supplier'
+  //     },
+  //     {
+  //       key: 303,
+  //       title: '应付账款',
+  //       src: '/ordertopay'
+  //     }
+  //   ]
+  // },
   {
     key: 4,
     title: '商品',
@@ -77,50 +73,50 @@ export default [
       }
     ]
   },
-  {
-    key: 6,
-    title: '营销',
-    children: [
-      {
-        key: 601,
-        title: '营销中心'
-      }
-    ]
-  },
-  {
-    key: 7,
-    title: '数据',
-    children: [
-      {
-        key: 701,
-        title: '销售统计'
-      },
-      {
-        key: 702,
-        title: '商品流水'
-      },
-      {
-        key: 703,
-        title: '经营分析'
-      },
-      {
-        key: 704,
-        title: '商品销售'
-      },
-      {
-        key: 705,
-        title: '商品记录'
-      },
-      {
-        key: 706,
-        title: '库存记录'
-      },
-      {
-        key: 707,
-        title: '业绩统计'
-      }
-    ]
-  },
+  // {
+  //   key: 6,
+  //   title: '营销',
+  //   children: [
+  //     {
+  //       key: 601,
+  //       title: '营销中心'
+  //     }
+  //   ]
+  // },
+  // {
+  //   key: 7,
+  //   title: '数据',
+  //   children: [
+  //     {
+  //       key: 701,
+  //       title: '销售统计'
+  //     },
+  //     {
+  //       key: 702,
+  //       title: '商品流水'
+  //     },
+  //     {
+  //       key: 703,
+  //       title: '经营分析'
+  //     },
+  //     {
+  //       key: 704,
+  //       title: '商品销售'
+  //     },
+  //     {
+  //       key: 705,
+  //       title: '商品记录'
+  //     },
+  //     {
+  //       key: 706,
+  //       title: '库存记录'
+  //     },
+  //     {
+  //       key: 707,
+  //       title: '业绩统计'
+  //     }
+  //   ]
+  // },
   {
     key: 1,
     title: '门店',

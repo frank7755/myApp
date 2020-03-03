@@ -316,7 +316,7 @@ export default class App extends React.Component {
           <h2 className="title">
             <span>商品详情</span>
           </h2>
-          <BraftEditor></BraftEditor>
+          {/* <BraftEditor></BraftEditor> */}
         </Form>
       </Fragment>
     );

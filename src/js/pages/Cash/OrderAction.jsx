@@ -188,6 +188,50 @@ class AccessGoods extends React.Component {
   }
 }
 
+class GetLastTime extends React.Component {
+  state = {
+    days: '',
+    hours: '',
+    minutes: '',
+    seconds: ''
+  };
+
+  componentDidMount() {
+    this.getLastTime(moment(this.props.time));
+  }
+
+  getLastTime = time => {
+    let endTime = moment(time).add(7, 'days');
+
+    const tick = () => {
+      let currentTime = moment();
+
+      if (currentTime.isBefore(endTime)) {
+        const days = endTime.diff(currentTime, 'days');
+        const hours = endTime.diff(currentTime, 'hours') - days * 24;
+        const minutes = endTime.diff(currentTime, 'minutes') - days * 24 * 60 - hours * 60;
+        const seconds = endTime.diff(currentTime, 'seconds') - days * 24 * 60 * 60 - hours * 60 * 60 - minutes * 60;
+
+        this.setState({
+          days,
+          hours: hours < 10 ? '0' + hours : hours,
+          minutes: minutes < 10 ? '0' + minutes : minutes,
+          seconds: seconds < 10 ? '0' + seconds : seconds
+        });
+
+        setTimeout(tick, 1000 - new Date().getMilliseconds());
+      }
+    };
+
+    tick();
+  };
+  render() {
+    const { days, hours, minutes, seconds } = this.state;
+
+    return <p style={{ marginBottom: 10 }}>{`剩余操作时间 ${days} 天 ${hours} 小时 ${minutes} 分钟 ${seconds} 秒`}</p>;
+  }
+}
+
 class ActionType extends React.Component {
   accessRefund = type => {
     const { onChange } = this.props;
@@ -208,9 +252,8 @@ class ActionType extends React.Component {
   };
 
   render() {
-    const { refund_state, return_goods } = this.props;
+    const { refund_state, return_goods, startTime } = this.props;
     const { id, tid, refund_id } = this.props;
-
     return (
       <Fragment>
         {refund_state == '1' ? (
@@ -220,7 +263,7 @@ class ActionType extends React.Component {
               <div>
                 <h2>{status[refund_state]}</h2>
                 <p style={{ marginBottom: 5 }}>收到买家退货申请，请尽快处理。</p>
-                <p style={{ marginBottom: 5 }}>请在6天23小时43分钟48秒处理本次退款，如逾期未处理，将自动同意退款。</p>
+                {/* <GetLastTime time={startTime}></GetLastTime> */}
                 <div style={{ paddingTop: 15 }}>
                   <AccessGoods id={id} refund_id={refund_id} tid={tid} onChange={this.props.onChange}></AccessGoods>
                   <RefuseRefund id={id} type={3} refund_id={refund_id} tid={tid} onChange={this.props.onChange}></RefuseRefund>
@@ -233,7 +276,7 @@ class ActionType extends React.Component {
               <div>
                 <h2>{status[refund_state]}</h2>
                 <p style={{ marginBottom: 5 }}>收到买家仅退款申请，请尽快处理。</p>
-                <p style={{ marginBottom: 5 }}>请在6天23小时43分钟48秒处理本次退款，如逾期未处理，将自动同意退款。</p>
+                <GetLastTime time={startTime}></GetLastTime>
                 <div style={{ paddingTop: 15 }}>
                   <Popconfirm title="确定同意退款？" onConfirm={() => this.accessRefund(5)} okText="确定" cancelText="取消">
                     <Button type="primary">同意买家退款</Button>
@@ -251,8 +294,8 @@ class ActionType extends React.Component {
             <Icon type="stop" style={{ fontSize: 20, color: '#fc5050', marginTop: 3 }} />
             <div>
               <h2>{status[refund_state]}</h2>
-              <p style={{ marginBottom: 5 }}>你已拒绝本次退款申请，买家修改退货申请后，需要你重新处理。</p>
-              <p style={{ marginBottom: 5 }}>买家在6天21小时42分钟08秒内未响应，退款申请将自动撤销。</p>
+              <p style={{ marginBottom: 5 }}>你已拒绝本次退款申请，买家修改退货申请后，需要你重新处理</p>
+              <p style={{ marginBottom: 5 }}>买家在6天23小时59分钟30秒内未响应，退款申请将自动撤销</p>
               <div style={{ paddingTop: 15 }}>
                 <Popconfirm title="确定同意退款？" onConfirm={() => this.accessRefund(5)} okText="确定" cancelText="取消">
                   <Button type="primary">同意买家退款</Button>
@@ -370,6 +413,7 @@ export default class App extends React.Component {
             refund_id={data.refund_id}
             tid={data.tid}
             oid={data.oid}
+            startTime={data.refund_messages && data.refund_messages[0].created}
             refund_state={data.refund_state}
             return_goods={data.return_goods}
           ></ActionType>

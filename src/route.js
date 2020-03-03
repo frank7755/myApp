@@ -45,6 +45,9 @@ export default {
   '/cashcenter': {
     component: loadable(() => import('~js/pages/Cash/CashCenter.jsx'))
   },
+  '/sellsearch': {
+    component: loadable(() => import('~js/pages/Cash/SellSearch.jsx'))
+  },
   '/onlineorder': {
     component: loadable(() => import('~js/pages/Cash/OnlineOrder.jsx'))
   },

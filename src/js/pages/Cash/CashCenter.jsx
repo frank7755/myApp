@@ -75,7 +75,7 @@ class SingleDiscount extends React.Component {
 
     this.props.form.validateFields((error, values) => {
       if (!error) {
-        const newData = { ...data, newPrice_num: values.price_num * values.discount };
+        const newData = { ...data, newPrice_num: values.price_num * values.Discount_type };
 
         onChange && onChange(newData);
       }
@@ -115,7 +115,7 @@ class SingleDiscount extends React.Component {
               })(<Input placeholder="请输入优惠价格" />)}
             </FormItem>
             <FormItem label="折扣">
-              {getFieldDecorator('discount', { initialValue: 1 })(
+              {getFieldDecorator('Discount_type', { initialValue: 1 })(
                 <Radio.Group>
                   <Radio value={1}>不打折</Radio>
                   <Radio value={0.95}>95折</Radio>
@@ -148,16 +148,6 @@ function getHangData() {
   return [];
 }
 
-function getNewData(data) {
-  return data.map(item =>
-    Object.keys(item).forEach(key => {
-      key == 'inventory_quantity' || key == 's_photo' || key == 'threshold_remind' || key == 'unit' || key == 'unit_pinlei'
-        ? delete item[key]
-        : item[key];
-    })
-  );
-}
-
 @Form.create()
 class EditableTable extends React.Component {
   state = { data: [], editingKey: '', GoodsSource: [], hangData: getHangData() };
@@ -173,12 +163,17 @@ class EditableTable extends React.Component {
       width: 300
     },
     {
+      title: '规格',
+      dataIndex: 'properties_name_json',
+      width: 300
+    },
+    {
       title: '售价',
-      dataIndex: 'seling_price',
+      dataIndex: 'price',
       width: 200,
       editable: true,
-      render(seling_price) {
-        return `￥${formatThousands(seling_price)}`;
+      render(price) {
+        return `￥${formatThousands(price)}`;
       }
     },
     {
@@ -223,12 +218,12 @@ class EditableTable extends React.Component {
           <span>
             <EditableContext.Consumer>
               {form => (
-                <a onClick={() => this.save(form, record.goods_id)} style={{ marginRight: 8 }}>
+                <a onClick={() => this.save(form, record.sku_id)} style={{ marginRight: 8 }}>
                   保存
                 </a>
               )}
             </EditableContext.Consumer>
-            <Popconfirm title="确定要取消吗?" onConfirm={() => this.cancel(record.goods_id)}>
+            <Popconfirm title="确定要取消吗?" onConfirm={() => this.cancel(record.sku_id)}>
               <a>取消</a>
             </Popconfirm>
           </span>
@@ -238,12 +233,12 @@ class EditableTable extends React.Component {
               className="textEdit"
               style={{ marginRight: 10 }}
               disabled={this.isOff(record)}
-              onClick={() => this.edit(record.goods_id)}
+              onClick={() => this.edit(record.sku_id)}
             >
               编辑
             </a>
             <SingleDiscount onChange={values => this.handleSingleDiscount(values)} data={record}></SingleDiscount>
-            <Popconfirm title="确定要删除?" onConfirm={() => this.handleDelete(record.goods_id)}>
+            <Popconfirm title="确定要删除?" onConfirm={() => this.handleDelete(record.sku_id)}>
               <a className="textDelete">删除</a>
             </Popconfirm>
           </Fragment>
@@ -254,17 +249,17 @@ class EditableTable extends React.Component {
 
   handleSingleDiscount = values => {
     const { data } = this.state;
-    const newData = data.map(item => (item.goods_id == values.goods_id ? { ...item, ...values } : item));
+    const newData = data.map(item => (item.sku_id == values.sku_id ? { ...item, ...values } : item));
 
     this.setState({ data: newData });
   };
 
   handleDelete = value => {
     const { data } = this.state;
-    this.setState({ data: data.filter(item => item.goods_id != value) });
+    this.setState({ data: data.filter(item => item.sku_id != value) });
   };
 
-  isEditing = record => record.goods_id === this.state.editingKey;
+  isEditing = record => record.sku_id === this.state.editingKey;
 
   cancel = () => {
     this.setState({ editingKey: '' });
@@ -275,9 +270,9 @@ class EditableTable extends React.Component {
       if (error) {
         return;
       }
-      let price = row.count * row.seling_price;
+      let price = row.count * row.price;
       const newData = [...this.state.data];
-      const index = newData.findIndex(item => key === item.goods_id);
+      const index = newData.findIndex(item => key === item.sku_id);
 
       if (index > -1) {
         const item = newData[index];
@@ -302,8 +297,8 @@ class EditableTable extends React.Component {
 
   renderOption = item => {
     return (
-      <Option key={item.goods_id}>
-        <div className="global-search-item">{item.name + ' 自定义条形码:' + item.u_code + ' 供应商条形码:' + item.s_code}</div>
+      <Option key={item.sku_id}>
+        <div className="global-search-item">{item.name + '   ' + item.properties_name_json + ' 库存:' + item.quantity}</div>
       </Option>
     );
   };
@@ -313,36 +308,33 @@ class EditableTable extends React.Component {
     const { id } = this.props;
 
     value
-      ? request('http://114.67.90.231:8888/select_goods', {
+      ? request('http://114.67.90.231:8888/order_management/goods_select', {
           method: 'post',
-          body: { status: 0, id: id, name: value }
+          body: { id: id, name: value }
         }).then(payload => this.setState({ GoodsSource: payload.pageData }))
       : [];
   };
 
   onSelect = value => {
     const { GoodsSource, data } = this.state;
+
     if (data.length) {
-      data.every(item => item.goods_id != value)
+      data.every(item => item.sku_id != value)
         ? this.setState({
-            data: getNewData(
-              data.concat({
-                ...GoodsSource.filter(item => value == item.goods_id)[0],
-                count: 1,
-                price_num: GoodsSource.filter(item => value == item.goods_id)[0].seling_price
-              })
-            )
+            data: data.concat({
+              ...GoodsSource.filter(item => value == item.sku_id)[0],
+              count: 1,
+              price_num: GoodsSource.filter(item => value == item.sku_id)[0].price
+            })
           })
         : message.error('请勿重复添加!');
     } else {
       this.setState({
-        data: getNewData(
-          data.concat({
-            ...GoodsSource.filter(item => value == item.goods_id)[0],
-            count: 1,
-            price_num: GoodsSource.filter(item => value == item.goods_id)[0].seling_price
-          })
-        )
+        data: data.concat({
+          ...GoodsSource.filter(item => value == item.sku_id)[0],
+          count: 1,
+          price_num: GoodsSource.filter(item => value == item.sku_id)[0].price
+        })
       });
     }
     this.setState({ GoodsSource: [] });
@@ -369,6 +361,10 @@ class EditableTable extends React.Component {
     localStorage.setItem('hangData', JSON.stringify(newData));
   };
 
+  resetTable = () => {
+    this.setState({ data: [] });
+  };
+
   render() {
     const { data, GoodsSource, hangData } = this.state;
 
@@ -393,7 +389,7 @@ class EditableTable extends React.Component {
             min: col.min,
             max: col.max,
             step: col.step,
-            inputType: col.dataIndex === 'seling_price' || col.dataIndex === 'count' ? 'number' : 'text',
+            inputType: col.dataIndex === 'price' || col.dataIndex === 'count' ? 'number' : 'text',
             dataIndex: col.dataIndex,
             title: col.title,
             editing: this.isEditing(record)
@@ -404,6 +400,7 @@ class EditableTable extends React.Component {
 
     data.length &&
       data.forEach(item => {
+        console.log(item);
         sumCount += +item.count;
         sumAmount += +item.price_num;
         sumPay += item.newPrice_num ? +item.newPrice_num : +item.price_num;
@@ -428,12 +425,11 @@ class EditableTable extends React.Component {
         <div className={styles.actions}>
           <PayDrawer
             id={this.props.id}
-            user_name={this.props.user_name}
             sumAmount={sumAmount}
             sumCount={sumCount}
             sumPay={sumPay}
-            user_id={this.props.user_id}
             data={data}
+            onChange={this.resetTable}
           ></PayDrawer>
           <Button type="danger" onClick={this.hangup}>
             挂单
@@ -453,7 +449,7 @@ class EditableTable extends React.Component {
           <Input suffix={<Icon type="search" />} />
         </AutoComplete>
         <Table
-          rowKey="goods_id"
+          rowKey="sku_id"
           components={components}
           dataSource={data}
           columns={columns}
@@ -526,7 +522,7 @@ class HangUpOrder extends React.PureComponent {
                     <i>{index + 1}</i>
                     <div key={index}>
                       {item.map(order => (
-                        <p key={order.goods_id}>{order.name}</p>
+                        <p key={order.sku_id}>{order.name}</p>
                       ))}
                     </div>
                   </div>
@@ -602,6 +598,11 @@ class PayDrawer extends React.Component {
   resetData = () => {
     this.setState({ staff_id: '', staff_name: '', vip_id: '' });
   };
+  resetOutTable = () => {
+    const { onChange } = this.props;
+
+    onChange && onChange();
+  };
 
   render() {
     const { GuideSource, VipSource, staff_id, staff_name, vip_id } = this.state;
@@ -610,16 +611,15 @@ class PayDrawer extends React.Component {
     return (
       <FormDrawer
         className={styles.PayDrawer}
-        action="http://114.67.90.231:8888/insert_order"
+        action="http://114.67.90.231:8888/order_management/insert"
         title="结账"
         filter={data => ({
           id: this.props.id,
-          user_name: this.props.user_name,
-          user_id: this.props.user_id,
           ...data
         })}
         afterVisibleChange={this.resetData}
-        data={{ payload: this.props.data }}
+        data={{ skus: this.props.data }}
+        onSubmit={this.resetOutTable}
         trigger={<Button type="primary">结账</Button>}
         headers={{ 'Content-Type': 'application/json' }}
       >
@@ -682,7 +682,7 @@ class PayDrawer extends React.Component {
                   {getFieldDecorator('pur_sal', {
                     initialValue: sumAmount,
                     rules: [{ required: true }]
-                  })(<Input disabled></Input>)}
+                  })(<Input disabled suffix="元"></Input>)}
                 </FormItem>
               </section>
               <section>
@@ -691,26 +691,6 @@ class PayDrawer extends React.Component {
                     initialValue: sumCount,
                     rules: [{ required: true }]
                   })(<Input disabled></Input>)}
-                </FormItem>
-              </section>
-              <section>
-                <FormItem label="实付金额">
-                  {getFieldDecorator('sal', {
-                    initialValue: sumPay,
-                    rules: [{ required: true }]
-                  })(<Input disabled></Input>)}
-                </FormItem>
-              </section>
-              <section>
-                <FormItem label="订单类型">
-                  {getFieldDecorator('status', {
-                    rules: [{ required: true, message: '请选择订单类型' }]
-                  })(
-                    <Select placeholder="请选择订单类型">
-                      <Option value={0}>销货</Option>
-                      <Option value={1}>退货</Option>
-                    </Select>
-                  )}
                 </FormItem>
               </section>
               <section>
@@ -728,12 +708,14 @@ class PayDrawer extends React.Component {
                 </FormItem>
               </section>
               <FormItem label="优惠价格">
-                {getFieldDecorator('Discount_type', {
+                {getFieldDecorator('sal', {
+                  initialValue: sumPay,
                   rules: [{ required: true, message: '请输入最终优惠价格' }]
                 })(
                   <InputNumber
                     placeholder="请输入最终优惠价格"
                     min={0}
+                    suffix="元"
                     formatter={value => `￥ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
                     parser={value => value.replace(/\￥\s?|(,*)/g, '')}
                     style={{ width: '100%' }}

@@ -3,25 +3,7 @@ import request from '~js/utils/request';
 import moment from 'moment';
 import { formatThousands } from '~js/utils/utils';
 import styles from '~css/Cash/OnlineOrder.module.less';
-import {
-  Popconfirm,
-  Icon,
-  Divider,
-  Pagination,
-  Button,
-  Modal,
-  Form,
-  Input,
-  message,
-  DatePicker,
-  Select,
-  Row,
-  Alert,
-  Col,
-  Table
-} from 'antd';
-import FormSearch from '~js/components/FormSearch/';
-import serveTable from '~js/components/serveTable';
+import { Pagination, Button, Modal, Form, Input, message, DatePicker, Select, Row, Alert, Col, Table } from 'antd';
 import {
   getCurrMonth,
   getCurrWeek,
@@ -62,7 +44,8 @@ class SendGoods extends React.Component {
 
   showModal = () => {
     this.setState({
-      visible: true
+      visible: true,
+      selectedRowKeys: []
     });
   };
 
@@ -121,20 +104,24 @@ class SendGoods extends React.Component {
     const { selectedRowKeys } = this.state;
     const { onChange } = this.props;
 
-    request('http://114.67.90.231:8888/order_management/yz_order_confirm', {
-      method: 'post',
-      body: {
-        id: this.props.id,
-        tid: this.props.tid,
-        oids: selectedRowKeys.join(',')
-      }
-    })
-      .then(payload => {
-        message.success('发货成功');
-        this.setState({ visible: false });
-        onChange && onChange();
+    if (selectedRowKeys.length) {
+      request('http://114.67.90.231:8888/order_management/yz_order_confirm', {
+        method: 'post',
+        body: {
+          id: this.props.id,
+          tid: this.props.tid,
+          oids: selectedRowKeys.join(',')
+        }
       })
-      .catch(error => message.error(error.message));
+        .then(payload => {
+          message.success('发货成功');
+          this.setState({ visible: false, selectedRowKeys: [] });
+          onChange && onChange();
+        })
+        .catch(error => message.error(error.message));
+    } else {
+      message.error('请选择需要发货的商品');
+    }
   };
 
   render() {
@@ -212,13 +199,16 @@ class SendGoods extends React.Component {
   }
 }
 
+@Form.create()
 class OrderList extends React.Component {
   state = {
     listData: [],
-    page: 1,
-    pageSize: 5,
     total: null
   };
+
+  componentDidMount() {
+    this.handleSearch();
+  }
 
   getDateRanges() {
     return {
@@ -230,99 +220,93 @@ class OrderList extends React.Component {
     };
   }
 
-  handleSearch = ({ dateRange = [], ...rest }) => {
-    const [start_time, end_time] = dateRange;
+  handleSearch = (page, pageSize) => {
+    this.props.form.validateFields((err, value) => {
+      const { dateRange, ...rest } = value;
+      const [start_time, end_time] = value.dateRange;
 
-    request('http://114.67.90.231:8888/order_management/goods_select', {
-      method: 'post',
-      body: {
-        id: this.props.id,
-        type: 1,
-        start_time: start_time,
-        end_time: end_time,
-        page: this.state.page,
-        pageSize: this.state.pageSize,
-        ...rest
+      if (!err) {
+        request('http://114.67.90.231:8888/order_management/goods_select', {
+          method: 'post',
+          body: {
+            id: this.props.id,
+            type: 1,
+            start_time: start_time,
+            end_time: end_time,
+            page: page || 1,
+            pageSize: pageSize || 20,
+            ...rest
+          }
+        }).then(payload => {
+          this.setState({ listData: payload.pageData, total: payload.total });
+        });
       }
-    }).then(payload => {
-      this.setState({ listData: payload.pageData, total: payload.total });
     });
   };
 
   render() {
     const { listData, total } = this.state;
+    const { getFieldDecorator } = this.props.form;
 
     return (
       <Fragment>
         <h2 className="title">
           <span>线上商品</span>
         </h2>
-        <FormSearch onSearch={this.handleSearch}>
-          {({ form }) => {
-            const { getFieldDecorator } = form;
-
-            return (
-              <Fragment>
-                <Row gutter={32} style={{ marginBottom: 24 }}>
-                  <Col span={8}>
-                    <span className={styles.rowItem}>
-                      <label>订单号：</label>
-                      {getFieldDecorator('tid')(<Input placeholder="请输入订单号" style={{ width: 'calc(100% - 80px)' }} />)}
-                    </span>
-                  </Col>
-                  <Col span={8}>
-                    <span className={styles.rowItem}>
-                      <label>商品名称：</label>
-                      {getFieldDecorator('title')(
-                        <Input placeholder="请输入商品名称" style={{ width: 'calc(100% - 80px)' }} />
-                      )}
-                    </span>
-                  </Col>
-                  <Col span={8}>
-                    <span className={styles.rowItem}>
-                      <label>选择日期：</label>
-                      {getFieldDecorator('dateRange', {
-                        initialValue: getLast7Days()
-                      })(
-                        <RangePicker allowClear={false} style={{ width: 'calc(100% - 80px)' }} ranges={this.getDateRanges()} />
-                      )}
-                    </span>
-                  </Col>
-                </Row>
-                <Row gutter={32} style={{ marginBottom: 24 }}>
-                  <Col span={8}>
-                    <span className={styles.rowItem}>
-                      <label>订单状态：</label>
-                      {getFieldDecorator('status_str', { initialValue: '' })(
-                        <Select style={{ width: 'calc(100% - 80px)' }}>
-                          <Option value="">全部</Option>
-                          <Option value="待付款">待付款</Option>
-                          <Option value="待发货">待发货</Option>
-                          <Option value="已发货">已发货</Option>
-                          <Option value="已完成">已完成</Option>
-                          <Option value="已关闭">已关闭</Option>
-                          <Option value="退款中">退款中</Option>
-                        </Select>
-                      )}
-                    </span>
-                  </Col>
-                </Row>
-                <Row style={{ marginBottom: 24 }}>
-                  <Col span={8}>
-                    <span className={styles.rowItem}>
-                      <Button type="primary" htmlType="submit">
-                        查询
-                      </Button>
-                      <Button type="gray" htmlType="reset">
-                        重置
-                      </Button>
-                    </span>
-                  </Col>
-                </Row>
-              </Fragment>
-            );
-          }}
-        </FormSearch>
+        <Form>
+          <Row gutter={32} style={{ marginBottom: 24 }}>
+            <Col span={8}>
+              <span className={styles.rowItem}>
+                <label>订单号：</label>
+                {getFieldDecorator('tid')(<Input placeholder="请输入订单号" style={{ width: 'calc(100% - 80px)' }} />)}
+              </span>
+            </Col>
+            <Col span={8}>
+              <span className={styles.rowItem}>
+                <label>商品名称：</label>
+                {getFieldDecorator('title')(<Input placeholder="请输入商品名称" style={{ width: 'calc(100% - 80px)' }} />)}
+              </span>
+            </Col>
+            <Col span={8}>
+              <span className={styles.rowItem}>
+                <label>选择日期：</label>
+                {getFieldDecorator('dateRange', {
+                  initialValue: getLast7Days()
+                })(<RangePicker allowClear={false} style={{ width: 'calc(100% - 80px)' }} ranges={this.getDateRanges()} />)}
+              </span>
+            </Col>
+          </Row>
+          <Row gutter={32} style={{ marginBottom: 24 }}>
+            <Col span={8}>
+              <span className={styles.rowItem}>
+                <label>订单状态：</label>
+                {getFieldDecorator('status_str', { initialValue: '' })(
+                  <Select style={{ width: 'calc(100% - 80px)' }}>
+                    <Option value="">全部</Option>
+                    <Option value="待付款">待付款</Option>
+                    <Option value="待发货">待发货</Option>
+                    <Option value="已发货">已发货</Option>
+                    <Option value="已完成">已完成</Option>
+                    <Option value="已关闭">已关闭</Option>
+                    <Option value="退款中">退款中</Option>
+                  </Select>
+                )}
+              </span>
+            </Col>
+          </Row>
+          <Row style={{ marginBottom: 24 }}>
+            <Col span={8}>
+              <span className={styles.rowItem}>
+                <Button type="primary" htmlType="submit">
+                  查询
+                </Button>
+                <Button type="gray" htmlType="reset">
+                  重置
+                </Button>
+              </span>
+            </Col>
+          </Row>
+        </Form>
         <div className={styles.orderList}>
           <ul className={styles.listHeader}>
             <li className={styles.listHeaderItem}>商品</li>
@@ -352,7 +336,14 @@ class OrderList extends React.Component {
               ></ListItemTable>
             ))}
         </div>
-        <Pagination current={1} pageSize={this.state.pageSize} total={total} onChange={this.handleSearch}></Pagination>
+        <Pagination
+          className={styles.pagination}
+          defaultCurrent={1}
+          pageSize={20}
+          total={100}
+          showQuickJumper
+          onChange={this.handleSearch}
+        ></Pagination>
       </Fragment>
     );
   }
@@ -511,6 +502,10 @@ class ListItemTable extends React.Component {
       width: '10%',
       align: 'center',
       render: (options, record, index) => {
+        {
+          console.log(this.props.onChange);
+        }
+
         if (index == 0) {
           if (record.status_str == '待发货') {
             return {

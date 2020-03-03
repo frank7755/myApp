@@ -1,9 +1,9 @@
-import React, { Fragment } from "react";
-import request from "~js/utils/request";
-import { message, Layout, Menu, Icon, Dropdown, Avatar } from "antd";
-import { Link } from "react-router-dom";
-import menu from "~src/menu.js";
-import styles from "./Index.module.less";
+import React, { Fragment } from 'react';
+import request from '~js/utils/request';
+import { message, Layout, Menu, Icon, Dropdown, Avatar } from 'antd';
+import { Link } from 'react-router-dom';
+import menu from '~src/menu.js';
+import styles from './Index.module.less';
 
 export default class App extends React.Component {
   state = {
@@ -11,15 +11,16 @@ export default class App extends React.Component {
     info: null
   };
   handleLogout = () => {
-    request("http://114.67.90.231:8888/login_out").then(
-      this.props.history.push("/login")
-    );
+    request('http://114.67.90.231:8888/login_out').then(this.props.history.push('/login'));
   };
 
   componentWillMount() {
-    request("http://114.67.90.231:8888/login_check")
+    request('http://114.67.90.231:8888/login_check')
       .then(payload => this.setState({ draw: true, info: payload }))
-      .catch(error => message.error(error.message));
+      .catch(error => {
+        console.error(error);
+        message.error(error.message);
+      });
   }
 
   render() {
@@ -38,20 +39,20 @@ export default class App extends React.Component {
     );
 
     return draw ? (
-      <Layout style={{ height: "100%", overflow: "hidden" }}>
+      <Layout style={{ height: '100%', overflow: 'hidden' }}>
         <Sider
           className={styles.slider}
           width={200}
           style={{
-            overflow: "auto",
-            height: "100vh",
-            position: "fixed",
+            overflow: 'auto',
+            height: '100vh',
+            position: 'fixed',
             left: 0
           }}
           theme="dark"
         >
           <div className={styles.logo}>
-            <img src={require("~images/logo.png")}></img>
+            <img src={require('~images/logo.png')}></img>
           </div>
           <Menu theme="dark" mode="inline" className={styles.menu}>
             {menu.map(nav => (
@@ -79,10 +80,7 @@ export default class App extends React.Component {
             <ul>
               <Dropdown overlay={userSlideMenu}>
                 <li>
-                  <Avatar
-                    style={{ backgroundColor: "#87d068", marginRight: 10 }}
-                    icon="user"
-                  />
+                  <Avatar style={{ backgroundColor: '#87d068', marginRight: 10 }} icon="user" />
                   {info.telnumber}
                 </li>
               </Dropdown>
@@ -91,8 +89,8 @@ export default class App extends React.Component {
           <Content
             style={{
               padding: 24,
-              height: "100%",
-              overflow: "initial"
+              height: '100%',
+              overflow: 'initial'
             }}
           >
             {this.props.children(info.id, info.user_name, info.telnumber)}
