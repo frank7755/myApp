@@ -400,7 +400,7 @@ class EditableTable extends React.Component {
 
     data.length &&
       data.forEach(item => {
-        console.log(item);
+        console.log(item.newPrice_num);
         sumCount += +item.count;
         sumAmount += +item.price_num;
         sumPay += item.newPrice_num ? +item.newPrice_num : +item.price_num;
@@ -712,13 +712,12 @@ class PayDrawer extends React.Component {
                   initialValue: sumPay,
                   rules: [{ required: true, message: '请输入最终优惠价格' }]
                 })(
-                  <InputNumber
+                  <Input
                     placeholder="请输入最终优惠价格"
                     min={0}
                     suffix="元"
-                    formatter={value => `￥ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
-                    parser={value => value.replace(/\￥\s?|(,*)/g, '')}
-                    style={{ width: '100%' }}
+                    prefix="￥"
+                    style={{ width: '100%', color: '#fc5050', fontSize: 16 }}
                   />
                 )}
               </FormItem>
