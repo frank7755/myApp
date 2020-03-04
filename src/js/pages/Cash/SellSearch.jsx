@@ -1,10 +1,10 @@
 import React, { Fragment } from 'react';
 import moment from 'moment';
-import { formatThousands } from '~js/utils/utils';
+import { formatThousands, debounce } from '~js/utils/utils';
 import request from '~js/utils/request';
 import styles from '~css/Cash/SellSearch.module.less';
 import FormSearch from '~js/components/FormSearch/';
-import { Pagination, Button, Modal, Form, Input, message, DatePicker, Select, Row, Alert, Col, Table } from 'antd';
+import { Button, Modal, Form, Input, message, DatePicker, Select, Row, Col, Table, AutoComplete, Icon } from 'antd';
 import {
   getCurrMonth,
   getCurrWeek,
@@ -19,6 +19,130 @@ import serveTable from '~js/components/serveTable';
 const FormItem = Form.Item;
 const { Option } = Select;
 const { RangePicker } = DatePicker;
+
+@Form.create()
+class ReturnGoods extends React.Component {
+  state = {
+    visible: false,
+    GuideSource: [],
+    staff_id: '',
+    staff_name: ''
+  };
+
+  showModal = () => {
+    this.setState({
+      visible: true
+    });
+  };
+
+  handleOk = () => {
+    const { onChange } = this.props;
+    this.props.form.validateFields((error, values) => {
+      const { orderNum, pay_type } = this.props;
+      if (!error) {
+        request('http://114.67.90.231:8888/order_management/del', {
+          method: 'post',
+          body: {
+            id: this.props.id,
+            pur_no: orderNum,
+            pay_type: pay_type,
+            ...values,
+            ...this.props.record
+          }
+        }).then(payload => {
+          this.setState({ visible: false });
+          message.success('退货成功');
+          this.props.form.resetFields();
+          onChange && onChange();
+        });
+      }
+    });
+  };
+
+  handleCancel = e => {
+    this.setState({
+      visible: false
+    });
+  };
+
+  @debounce(150)
+  handleGuideSearch = value => {
+    const { id } = this.props;
+
+    value
+      ? request('http://114.67.90.231:8888/select_employess', {
+          method: 'post',
+          body: { id: id, name: value }
+        }).then(payload => this.setState({ GuideSource: payload.pageData }))
+      : [];
+  };
+
+  onGuideSelect = value => {
+    const { GuideSource } = this.state;
+    const GuideInfo = GuideSource.filter(item => item.staff_id == value)[0];
+    this.setState({ staff_id: GuideInfo.staff_id, staff_name: GuideInfo.staff_name });
+  };
+
+  renderGuideOption = item => {
+    return (
+      <Option key={item.staff_id}>
+        <div className="global-search-item">{item.staff_name + ' ' + item.staff_id}</div>
+      </Option>
+    );
+  };
+
+  render() {
+    const { getFieldDecorator } = this.props.form;
+    const { visible, staff_name, staff_id, GuideSource } = this.state;
+
+    return (
+      <Fragment>
+        <Button disabled={this.props.record.free_status != 1} onClick={this.showModal}>
+          退货
+        </Button>
+        <Modal title="员工选择" width={500} visible={visible} onOk={this.handleOk} onCancel={this.handleCancel}>
+          <Form>
+            <FormItem label="导购员搜索">
+              <AutoComplete
+                className="global-search"
+                style={{ width: '100%', marginBottom: 24 }}
+                dataSource={GuideSource.map(this.renderGuideOption)}
+                onSelect={this.onGuideSelect}
+                onSearch={this.handleGuideSearch}
+                placeholder="导购员id/姓名"
+                optionLabelProp="text"
+              >
+                <Input suffix={<Icon type="search" />} />
+              </AutoComplete>
+            </FormItem>
+            <FormItem label="导购员姓名">
+              {getFieldDecorator('staff_name', {
+                initialValue: staff_name,
+                rules: [
+                  {
+                    requires: true,
+                    message: '请搜索并填写导购员姓名'
+                  }
+                ]
+              })(<Input disabled></Input>)}
+            </FormItem>
+            <FormItem label="导购员id">
+              {getFieldDecorator('staff_id', {
+                initialValue: staff_id,
+                rules: [
+                  {
+                    requires: true,
+                    message: '请搜索并填写导购员id'
+                  }
+                ]
+              })(<Input disabled></Input>)}
+            </FormItem>
+          </Form>
+        </Modal>
+      </Fragment>
+    );
+  }
+}
 
 class GoodsDetails extends React.Component {
   state = {
@@ -46,7 +170,7 @@ class GoodsDetails extends React.Component {
     },
     {
       title: '商品单价',
-      dataIndex: 'seling_price',
+      dataIndex: 'price',
       render(val) {
         return `￥ ${formatThousands(val)}`;
       }
@@ -61,12 +185,28 @@ class GoodsDetails extends React.Component {
     {
       title: '操作',
       dataIndex: '退货',
-      render: () => {
-        return <Button type="red">退货</Button>;
-      },
-      align: 'center'
+      align: 'center',
+      render: (val, record) => (
+        <ReturnGoods
+          id={this.props.id}
+          orderNum={this.props.orderNum}
+          pay_type={this.props.pay_type}
+          record={record}
+          onChange={this.refreshTable}
+        ></ReturnGoods>
+      )
     }
   ];
+  refreshTable = () => {
+    request('http://114.67.90.231:8888/order_management/select', {
+      method: 'post',
+      body: {
+        id: this.props.id,
+        pur_no: this.props.orderNum,
+        type: this.props.type
+      }
+    }).then(payload => this.setState({ data: payload.pageData.skus }));
+  };
 
   showModal = () => {
     this.setState({
@@ -98,7 +238,7 @@ class GoodsDetails extends React.Component {
           查看详情
         </Button>
         <Modal title="订单详情" width={1200} visible={visible} onOk={this.handleOk} onCancel={this.handleCancel}>
-          <Table columns={this.columns} dataSource={data}></Table>
+          <Table columns={this.columns} dataSource={data} pagination={false}></Table>
         </Modal>
       </Fragment>
     );
@@ -145,7 +285,7 @@ class SearchTable extends React.Component {
       dataIndex: 'option',
       align: 'center',
       render: (val, record) => {
-        return <GoodsDetails id={this.props.id} orderNum={record.pur_no} type={2}></GoodsDetails>;
+        return <GoodsDetails id={this.props.id} orderNum={record.pur_no} pay_type={record.pay_type} type={2}></GoodsDetails>;
       }
     }
   ];
