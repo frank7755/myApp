@@ -308,7 +308,7 @@ class EditableTable extends React.Component {
     const { id } = this.props;
 
     value
-      ? request('http://114.67.90.231:8888/order_management/goods_select', {
+      ? request('http://114.67.90.231:8888/local_order_management/goods_select', {
           method: 'post',
           body: { id: id, name: value }
         }).then(payload => this.setState({ GoodsSource: payload.pageData }))
@@ -338,7 +338,6 @@ class EditableTable extends React.Component {
       });
     }
     this.setState({ GoodsSource: [] });
-    console.log(data);
   };
 
   hangup = () => {

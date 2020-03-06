@@ -60,7 +60,24 @@ export default {
   '/sourcecenter': {
     component: loadable(() => import('~js/pages/Upload/Index.jsx'))
   },
-
+  '/propertydetails': {
+    component: loadable(() => import('~js/pages/Property/PropertyDetails.jsx'))
+  },
+  '/withdrawrecord': {
+    component: loadable(() => import('~js/pages/Property/WithdrawRecord.jsx'))
+  },
+  '/selldata': {
+    component: loadable(() => import('~js/pages/Data/SellData.jsx'))
+  },
+  '/sellrank': {
+    component: loadable(() => import('~js/pages/Data/SellRank.jsx'))
+  },
+  '/sellanalysis': {
+    component: loadable(() => import('~js/pages/Data/SellAnalysis.jsx'))
+  },
+  '/singlegoods': {
+    component: loadable(() => import('~js/pages/Data/SingleGoods.jsx'))
+  },
   // 错误页
   '/403': {
     layout: false,

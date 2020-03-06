@@ -13,6 +13,7 @@ import {
   getLast7Days,
   getYesterday
 } from '~js/utils/date-fns';
+import { Link } from 'react-router-dom';
 const { Option } = Select;
 const { RangePicker } = DatePicker;
 
@@ -220,7 +221,7 @@ class OrderList extends React.Component {
     };
   }
 
-  handleSearch = (page, pageSize) => {
+  fetch = (page, pageSize) => {
     this.props.form.validateFields((err, value) => {
       const { dateRange, ...rest } = value;
       const [start_time, end_time] = value.dateRange;
@@ -244,6 +245,14 @@ class OrderList extends React.Component {
     });
   };
 
+  handleSearch = () => {
+    this.fetch();
+  };
+
+  handleRest = () => {
+    this.props.form.resetFields();
+  };
+
   render() {
     const { listData, total } = this.state;
     const { getFieldDecorator } = this.props.form;
@@ -253,7 +262,7 @@ class OrderList extends React.Component {
         <h2 className="title">
           <span>线上商品</span>
         </h2>
-        <Form>
+        <Form onSubmit={this.handleSearch} onReset={this.handleRest}>
           <Row gutter={32} style={{ marginBottom: 24 }}>
             <Col span={8}>
               <span className={styles.rowItem}>
@@ -342,7 +351,7 @@ class OrderList extends React.Component {
           pageSize={20}
           total={100}
           showQuickJumper
-          onChange={this.handleSearch}
+          onChange={(page, pageSize) => this.fetch(page, pageSize)}
         ></Pagination>
       </Fragment>
     );
@@ -413,11 +422,11 @@ class ListItemTable extends React.Component {
       align: 'center',
       render: (val, record, index) => {
         if (val == '1') {
-          return <a href={`#/onlineorder/action/${record.refund_id}`}>{status[record.refund_state]}</a>;
+          return <Link to={`/onlineorder/action/${record.refund_id}`}>{status[record.refund_state]}</Link>;
         } else if (val == null) {
           return '';
         }
-        return <a href={`#/onlineorder/action/${record.refund_id}`}>{status[60]}</a>;
+        return <Link to={`/onlineorder/action/${record.refund_id}`}>{status[60]}</Link>;
       }
     },
     {
@@ -502,10 +511,6 @@ class ListItemTable extends React.Component {
       width: '10%',
       align: 'center',
       render: (options, record, index) => {
-        {
-          console.log(this.props.onChange);
-        }
-
         if (index == 0) {
           if (record.status_str == '待发货') {
             return {
@@ -574,7 +579,7 @@ class ListItemTable extends React.Component {
           <span>
             订单号：{item.tid} 下单时间：{moment(item.created).format('YYYY-MM-DD')}
           </span>
-          <a href={`#/onlineorder/${item.tid}`}>查看详情</a>
+          <Link to={`/onlineorder/${item.tid}`}>查看详情</Link>
         </div>
         <Table {...rest} pagination={false} columns={this.columns} rowKey="oid" dataSource={data} bordered></Table>
       </div>

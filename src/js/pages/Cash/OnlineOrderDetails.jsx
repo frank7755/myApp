@@ -61,7 +61,6 @@ class Refund extends React.Component {
     const { getFieldDecorator } = this.props.form;
     const { price } = this.props;
     const { visible } = this.state;
-    console.log(price);
 
     return (
       <Fragment>
@@ -261,7 +260,7 @@ export default class App extends React.Component {
             <h3>付款信息</h3>
             <div>
               <p>
-                <span>实付金额：</span>￥{formatThousands(data.discount_price)}
+                <span>实付金额：</span>￥{formatThousands(data.discount_price)} 元
               </p>
               <p>
                 <span>付款时间：</span>

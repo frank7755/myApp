@@ -83,40 +83,32 @@ export default [
   //     }
   //   ]
   // },
-  // {
-  //   key: 7,
-  //   title: '数据',
-  //   children: [
-  //     {
-  //       key: 701,
-  //       title: '销售统计'
-  //     },
-  //     {
-  //       key: 702,
-  //       title: '商品流水'
-  //     },
-  //     {
-  //       key: 703,
-  //       title: '经营分析'
-  //     },
-  //     {
-  //       key: 704,
-  //       title: '商品销售'
-  //     },
-  //     {
-  //       key: 705,
-  //       title: '商品记录'
-  //     },
-  //     {
-  //       key: 706,
-  //       title: '库存记录'
-  //     },
-  //     {
-  //       key: 707,
-  //       title: '业绩统计'
-  //     }
-  //   ]
-  // },
+  {
+    key: 7,
+    title: '数据',
+    children: [
+      {
+        key: 701,
+        title: '销售统计',
+        src: '/selldata'
+      },
+      {
+        key: 702,
+        title: '商品排行',
+        src: '/sellrank'
+      },
+      {
+        key: 703,
+        title: '经营分析',
+        src: '/sellanalysis'
+      },
+      {
+        key: 704,
+        title: '经营分析',
+        src: '/singlegoods'
+      }
+    ]
+  },
   {
     key: 1,
     title: '门店',
@@ -153,9 +145,25 @@ export default [
     title: '素材',
     children: [
       {
-        key: 601,
+        key: 201,
         title: '素材中心',
         src: '/sourcecenter'
+      }
+    ]
+  },
+  {
+    key: 9,
+    title: '资产',
+    children: [
+      {
+        key: 901,
+        title: '资产明细',
+        src: '/propertydetails'
+      },
+      {
+        key: 902,
+        title: '提现记录',
+        src: '/withdrawrecord'
       }
     ]
   }
