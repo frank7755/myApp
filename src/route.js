@@ -78,6 +78,9 @@ export default {
   '/singlegoods': {
     component: loadable(() => import('~js/pages/Data/SingleGoods.jsx'))
   },
+  '/guiderecord': {
+    component: loadable(() => import('~js/pages/Data/GuideRecord.jsx'))
+  },
   // 错误页
   '/403': {
     layout: false,

@@ -106,6 +106,11 @@ export default [
         key: 704,
         title: '经营分析',
         src: '/singlegoods'
+      },
+      {
+        key: 705,
+        title: '业绩分析',
+        src: '/guiderecord'
       }
     ]
   },
