@@ -96,7 +96,7 @@ export default class App extends React.Component {
   };
 
   handleSubmit = e => {
-    e.stopPropagation();
+    e.preventDefault();
 
     this.props.form.validateFields((error, values) => {
       const [start_time, end_time] = values.dateRange;
@@ -160,8 +160,6 @@ export default class App extends React.Component {
   render() {
     const { getFieldDecorator } = this.props.form;
     const { GoodsSource, tableSource, data } = this.state;
-
-    console.log(data);
 
     return (
       <div className={styles.singleGoods}>

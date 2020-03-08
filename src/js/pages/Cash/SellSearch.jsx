@@ -55,6 +55,9 @@ class ReturnGoods extends React.Component {
           this.props.form.resetFields();
           onChange && onChange();
         });
+      } else {
+        message.error('请填写必填项!');
+        this.props.form.resetFields();
       }
     });
   };
@@ -233,6 +236,10 @@ class GoodsDetails extends React.Component {
         type: this.props.type
       }
     }).then(payload => this.setState({ data: payload.pageData.skus }));
+  };
+
+  handleOk = () => {
+    this.setState({ visible: false });
   };
 
   handleCancel = e => {
