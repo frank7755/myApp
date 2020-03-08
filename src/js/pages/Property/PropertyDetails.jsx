@@ -102,7 +102,7 @@ class DetailsTable extends React.Component {
         </h2>
         <Row gutter={16} className={styles.propetySum}>
           <Col span={6}>
-            <Statistic title="待提现余额(元)" value={table.response.pay_present} />
+            <Statistic title="待提现余额(元)" value={table.response.pay_present} precision={2} />
             <Popconfirm title="确定要提现吗？" okText="确定" cancelText="取消" onConfirm={this.handleWithdraw}>
               <Button style={{ marginTop: 16 }} type="primary">
                 提现
@@ -110,7 +110,7 @@ class DetailsTable extends React.Component {
             </Popconfirm>
           </Col>
           <Col span={6}>
-            <Statistic title="已提现余额(元)" value={`￥${table.response.pay_Withdrawals}`} precision={2} />
+            <Statistic title="已提现余额(元)" value={table.response.pay_Withdrawals} precision={2} />
           </Col>
           <Col span={6}>
             <Statistic title="已退款余额(元)" value={table.response.pay_refund} precision={2} />
