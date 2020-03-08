@@ -104,7 +104,7 @@ export default [
       },
       {
         key: 704,
-        title: '经营分析',
+        title: '单品查询',
         src: '/singlegoods'
       },
       {

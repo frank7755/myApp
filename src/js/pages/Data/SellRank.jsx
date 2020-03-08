@@ -68,7 +68,7 @@ class SingleTable extends React.Component {
     }).then(payload => this.setState({ source: payload.pageData, data: payload }));
   };
 
-  handleChange = () => {
+  handleChange = pagination => {
     request('http://114.67.90.231:8888/BI/select', {
       method: 'post',
       body: {

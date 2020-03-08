@@ -120,7 +120,7 @@ class ReturnGoods extends React.Component {
                 initialValue: staff_name,
                 rules: [
                   {
-                    requires: true,
+                    required: true,
                     message: '请搜索并填写导购员姓名'
                   }
                 ]
@@ -131,11 +131,22 @@ class ReturnGoods extends React.Component {
                 initialValue: staff_id,
                 rules: [
                   {
-                    requires: true,
+                    required: true,
                     message: '请搜索并填写导购员id'
                   }
                 ]
               })(<Input disabled></Input>)}
+            </FormItem>
+            <FormItem label="退货金额">
+              {getFieldDecorator('return_num', {
+                initialValue: this.props.newPrice_num,
+                rules: [
+                  {
+                    required: true,
+                    message: '请填写退货金额'
+                  }
+                ]
+              })(<Input type="text"></Input>)}
             </FormItem>
           </Form>
         </Modal>
@@ -177,7 +188,7 @@ class GoodsDetails extends React.Component {
     },
     {
       title: '实付金额',
-      dataIndex: 'price_num',
+      dataIndex: 'newPrice_num',
       render(val) {
         return `￥ ${formatThousands(val)}`;
       }
@@ -191,6 +202,7 @@ class GoodsDetails extends React.Component {
           id={this.props.id}
           orderNum={this.props.orderNum}
           pay_type={this.props.pay_type}
+          newPrice_num={record.newPrice_num}
           record={record}
           onChange={this.refreshTable}
         ></ReturnGoods>
@@ -238,7 +250,7 @@ class GoodsDetails extends React.Component {
           查看详情
         </Button>
         <Modal title="订单详情" width={1200} visible={visible} onOk={this.handleOk} onCancel={this.handleCancel}>
-          <Table columns={this.columns} dataSource={data} pagination={false}></Table>
+          <Table rowKey="sku_id" columns={this.columns} dataSource={data} pagination={false}></Table>
         </Modal>
       </Fragment>
     );
@@ -349,7 +361,7 @@ class SearchTable extends React.Component {
                     <span className={styles.rowItem}>
                       <label>选择日期：</label>
                       {getFieldDecorator('dateRange', {
-                        initialValue: getLast7Days()
+                        initialValue: [moment().subtract(1, 'year'), moment()]
                       })(
                         <RangePicker allowClear={false} style={{ width: 'calc(100% - 80px)' }} ranges={this.getDateRanges()} />
                       )}

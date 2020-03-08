@@ -21,6 +21,9 @@ export default {
   '/goodsadd': {
     component: loadable(() => import('~js/pages/Goods/GoodsAdd/Index.jsx'))
   },
+  '/ruleset': {
+    component: loadable(() => import('~js/pages/Goods/GoodsAdd/RuleSet.jsx'))
+  },
   '/goodssearch': {
     component: loadable(() => import('~js/pages/Goods/GoodsSearch.jsx'))
   },

@@ -540,7 +540,8 @@ class PayDrawer extends React.Component {
     VipSource: [],
     staff_id: '',
     staff_name: '',
-    vip_id: ''
+    vip_id: '',
+    vip_name: ''
   };
 
   @debounce(150)
@@ -577,7 +578,7 @@ class PayDrawer extends React.Component {
   renderVipOption = item => {
     return (
       <Option key={item.vip_id}>
-        <div className="global-search-item">{item.vip_id}</div>
+        <div className="global-search-item">{item.vip_id + ' ' + item.vip_name}</div>
       </Option>
     );
   };
@@ -591,15 +592,17 @@ class PayDrawer extends React.Component {
   onVipSelect = value => {
     const { VipSource } = this.state;
     const VipInfo = VipSource.filter(item => item.vip_id == value)[0];
-    this.setState({ vip_id: VipInfo.vip_id });
+    this.setState({ vip_id: VipInfo.vip_id, vip_name: VipInfo.vip_name });
   };
 
   resetData = () => {
     this.setState({ staff_id: '', staff_name: '', vip_id: '' });
   };
+
   resetOutTable = () => {
     const { onChange } = this.props;
 
+    message.success('结账成功');
     onChange && onChange();
   };
 

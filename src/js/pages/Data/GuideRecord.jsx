@@ -1,25 +1,23 @@
 import React, { Fragment } from 'react';
 import request from '~js/utils/request';
 import { formatThousands, debounce } from '~js/utils/utils';
-import styles from '~css/Property/PropertyDetails.module.less';
+import styles from '~css/Data/GuideRecord.module.less';
 import FormSearch from '~js/components/FormSearch/';
 import moment from 'moment';
 import serveTable from '~js/components/serveTable';
-import { Statistic, Row, Col, Button, Table, DatePicker, Pagination, Popconfirm, message } from 'antd';
+import { Statistic, Row, Col, Button, Table, DatePicker, Pagination, Popconfirm, message, Input, Form } from 'antd';
 
-const { MonthPicker } = DatePicker;
+const { RangePicker } = DatePicker;
+const FormItem = Form.Item;
 
 @serveTable()
 class RecordTable extends React.Component {
-  state = {
-    mode: ['month', 'month'],
-    value: []
-  };
+  handleSearch = ({ dateRange = [], ...rest }) => {
+    const [start_time, end_time] = dateRange;
 
-  handleSearch = value => {
     const { table, id } = this.props;
 
-    table.search({ id, start_time: value.start_time, end_time: value.end_time, type: 5 }, { ...table.pagination, current: 1 });
+    table.search({ id, start_time, end_time, type: 5, ...rest }, { ...table.pagination, current: 1 });
   };
 
   refresh = () => {
@@ -43,68 +41,53 @@ class RecordTable extends React.Component {
     },
     {
       title: '销售数量',
-      dataIndex: 'salces_count',
-      render: val => {
-        return `￥${formatThousands(val)}`;
-      }
+      dataIndex: 'salces_count'
     }
   ];
 
-  state = {
-    mode: ['month', 'month'],
-    value: []
-  };
-
-  handlePanelChange = (value, mode) => {
-    this.setState({
-      value,
-      mode: [mode[0] === 'date' ? 'month' : mode[0], mode[1] === 'date' ? 'month' : mode[1]]
-    });
-  };
-
-  handleChange = value => {
-    this.setState({ value });
-  };
-
   render() {
     const { table, ...restProps } = this.props;
-    const { mode, value } = this.state;
 
     return (
       <Fragment>
-        <h2 className="title">
-          <span>业绩分析</span>
-        </h2>
         <div className={styles.details}>
-          <FormSearch onSearch={this.handleSearch} className={styles.search}>
+          <h2 className="title">
+            <span>业绩分析</span>
+          </h2>
+          <FormSearch prefetch={false} onSearch={this.handleSearch} className={styles.search}>
             {({ form }) => {
               const { getFieldDecorator } = form;
 
               return (
-                <Row gutter={32} style={{ marginBottom: 24 }}>
-                  <Col span={8}>
-                    <span className={styles.rowItem}>
-                      <label>开始月份：</label>
-                      {getFieldDecorator('start_time', {
-                        initialValue: moment().startOf('month')
-                      })(<MonthPicker></MonthPicker>)}
-                    </span>
-                    <span className={styles.rowItem}>
-                      <label>结束月份：</label>
-                      {getFieldDecorator('end_time', {
-                        initialValue: moment().endOf('month')
-                      })(<MonthPicker></MonthPicker>)}
-                    </span>
-                  </Col>
-                  <Col span={8}>
-                    <span className={styles.rowItem}>
-                      <Button htmlType="submit" type="primary">
-                        查询
-                      </Button>
-                      <Button htmlType="reset">重置</Button>
-                    </span>
-                  </Col>
-                </Row>
+                <Fragment>
+                  <Row gutter={32}>
+                    <Col span={8}>
+                      <FormItem label="选择日期">
+                        {getFieldDecorator('dateRange', {
+                          initialValue: [moment().subtract(1, 'year'), moment()],
+                          rules: [{ required: true, message: '请选择日期' }]
+                        })(<RangePicker style={{ width: '100%' }}></RangePicker>)}
+                      </FormItem>
+                    </Col>
+                    <Col span={8}>
+                      <FormItem label="员工id">
+                        {getFieldDecorator('staff_id', {
+                          rules: [{ required: true, message: '请输入员工id' }]
+                        })(<Input type="text"></Input>)}
+                      </FormItem>
+                    </Col>
+                  </Row>
+                  <Row style={{ marginBottom: 24 }}>
+                    <Col span={8}>
+                      <span className={styles.rowItem}>
+                        <Button htmlType="submit" type="primary">
+                          查询
+                        </Button>
+                        <Button htmlType="reset">重置</Button>
+                      </span>
+                    </Col>
+                  </Row>
+                </Fragment>
               );
             }}
           </FormSearch>

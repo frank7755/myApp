@@ -561,7 +561,7 @@ class GoodsTable extends React.Component {
                     <span className={styles.rowItem}>
                       <label>选择日期：</label>
                       {getFieldDecorator('dateRange', {
-                        initialValue: getLast7Days()
+                        initialValue: [moment().subtract(1, 'year'), moment()]
                       })(
                         <RangePicker allowClear={false} style={{ width: 'calc(100% - 80px)' }} ranges={this.getDateRanges()} />
                       )}

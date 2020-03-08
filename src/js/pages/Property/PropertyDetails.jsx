@@ -68,10 +68,7 @@ class DetailsTable extends React.Component {
     },
     {
       title: '订单状态',
-      dataIndex: 'status_str',
-      render: val => {
-        return `￥${formatThousands(val)}`;
-      }
+      dataIndex: 'status_str'
     },
     {
       title: '退款金额',
@@ -136,7 +133,7 @@ class DetailsTable extends React.Component {
                     <span className={styles.rowItem}>
                       <label>选择日期：</label>
                       {getFieldDecorator('dateRange', {
-                        initialValue: getLast7Days()
+                        initialValue: [moment().subtract(0.5, 'year'), moment()]
                       })(
                         <RangePicker allowClear={false} style={{ width: 'calc(100% - 80px)' }} ranges={this.getDateRanges()} />
                       )}

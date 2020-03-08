@@ -8,8 +8,14 @@ import styles from './Index.module.less';
 export default class App extends React.Component {
   state = {
     draw: false,
-    info: null
+    info: null,
+    openKeys: ['8']
   };
+
+  onOpenChange = openKeys => {
+    this.setState({ openKeys });
+  };
+
   handleLogout = () => {
     request('http://114.67.90.231:8888/login_out').then(this.props.history.push('/login'));
   };
@@ -29,7 +35,12 @@ export default class App extends React.Component {
     const { draw, info } = this.state;
 
     const userSlideMenu = (
-      <Menu>
+      <Menu className={styles.dropDown}>
+        <Menu.Item>
+          <Link to="/">
+            <Icon type="home" style={{ marginRight: 5 }}></Icon>返回主页
+          </Link>
+        </Menu.Item>
         <Menu.Item onClick={this.handleLogout}>
           <a>
             <Icon type="logout" style={{ marginRight: 5 }}></Icon>退出登录
@@ -52,9 +63,17 @@ export default class App extends React.Component {
           theme="dark"
         >
           <div className={styles.logo}>
-            <img src={require('~images/logo.png')}></img>
+            <Link to="/">
+              <img src={require('~images/logo.png')}></img>
+            </Link>
           </div>
-          <Menu theme="dark" mode="inline" className={styles.menu}>
+          <Menu
+            theme="dark"
+            mode="inline"
+            className={styles.menu}
+            openKeys={this.state.openKeys}
+            onOpenChange={this.onOpenChange}
+          >
             {menu.map(nav => (
               <SubMenu
                 key={nav.key}
