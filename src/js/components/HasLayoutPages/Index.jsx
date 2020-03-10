@@ -21,7 +21,9 @@ export default class App extends React.Component {
   };
 
   componentWillMount() {
-    request('http://114.67.90.231:8888/login_check')
+    request('http://114.67.90.231:8888/login_check', {
+      method: 'post'
+    })
       .then(payload => this.setState({ draw: true, info: payload }))
       .catch(error => {
         console.error(error);

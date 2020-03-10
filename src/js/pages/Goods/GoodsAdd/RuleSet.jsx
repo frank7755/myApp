@@ -4,182 +4,152 @@ import styles from '~css/Goods/GoodsAdd/RuleSet.module.less';
 
 const FormItem = Form.Item;
 
-let id = 0;
-
-@Form.create()
 class DynamicFieldSet extends React.Component {
-  remove = k => {
-    const { form } = this.props;
-    // can use data-binding to get
-    const keys = form.getFieldValue('keys');
-    // We need at least one passenger
-    if (keys.length === 1) {
-      return;
-    }
-
-    // can use data-binding to set
-    form.setFieldsValue({
-      keys: keys.filter(key => key !== k)
-    });
+  state = {
+    id: 0,
+    mapKey: [],
+    skus: []
   };
 
   add = () => {
-    const { form } = this.props;
-    // can use data-binding to get
-    const keys = form.getFieldValue('keys');
-    const nextKeys = keys.concat(id++);
-    // can use data-binding to set
-    // important! notify form to detect changes
-    form.setFieldsValue({
-      keys: nextKeys
+    this.setState({ id: ++this.state.id }, () => {
+      this.setState({ mapKey: this.state.mapKey.concat(this.state.id) });
     });
   };
 
-  handleSubmit = e => {
-    e.preventDefault();
-    this.props.form.validateFields((err, values) => {
+  remove = key => {
+    const { mapKey } = this.state;
+    this.setState({
+      mapKey: mapKey.filter(item => item != key)
+    });
+  };
+
+  render() {
+    const { mapKey } = this.state;
+    const { getFieldDecorator } = this.props.form;
+    const { count } = this.props;
+
+    return (
+      <div className={styles.addRule} onChange={this.handleChange}>
+        <label style={{ width: 80 }}>规格值:</label>
+        <section className={styles.mapName}>
+          {mapKey.map(key => (
+            <span key={key}>
+              {getFieldDecorator(`v${count}_${key}`, {
+                rules: [{ required: true, message: '请填写规格值' }]
+              })(<Input type="text" style={{ width: 120 }}></Input>)}
+              <Icon type="minus-circle" style={{ marginRight: 10 }} onClick={() => this.remove(key)} />
+            </span>
+          ))}
+          <a onClick={this.add}>添加规格值</a>
+        </section>
+      </div>
+    );
+  }
+}
+
+class RulesSet extends React.Component {
+  state = {
+    val: {}
+  };
+
+  getData = () => {
+    this.props.form.validateFields((err, value) => {
       if (!err) {
-        const { keys, names } = values;
-        console.log('Received values of form: ', values);
-        console.log(
-          'Merged values:',
-          keys.map(key => names[key])
-        );
+        const { val } = this.state;
+        const itemValue = this.props.form.getFieldsValue();
+        this.setState({
+          val: itemValue
+        });
       }
     });
   };
 
   render() {
-    const { getFieldDecorator, getFieldValue } = this.props.form;
-    const formItemLayout = {
-      labelCol: {
-        xs: { span: 24 },
-        sm: { span: 4 }
-      },
-      wrapperCol: {
-        xs: { span: 24 },
-        sm: { span: 20 }
-      }
-    };
-    const formItemLayoutWithOutLabel = {
-      wrapperCol: {
-        xs: { span: 24, offset: 0 },
-        sm: { span: 20, offset: 4 }
-      }
-    };
-    getFieldDecorator('keys', { initialValue: [] });
-    const keys = getFieldValue('keys');
+    const { getFieldDecorator } = this.props.form;
+    const { k } = this.props;
 
     return (
-      <Fragment>
-        {keys.map((k, index) => (
-          <Fragment>
-            <Form.Item
-              {...(index === 0 ? formItemLayout : formItemLayoutWithOutLabel)}
-              label={index === 0 ? 'Passengers' : ''}
-              required={false}
-              key={k}
-            >
-              {getFieldDecorator(`names[${k}]`, {
-                validateTrigger: ['onChange', 'onBlur'],
-                rules: [
-                  {
-                    required: true,
-                    whitespace: true,
-                    message: "Please input passenger's name or delete this field."
-                  }
-                ]
-              })(<Input placeholder="passenger name" style={{ width: '60%', marginRight: 8 }} />)}
-              {keys.length > 1 ? (
-                <Icon className="dynamic-delete-button" type="minus-circle-o" onClick={() => this.remove(k)} />
-              ) : null}
-            </Form.Item>
-          </Fragment>
-        ))}
-        <a onClick={this.add} style={{ marginBottom: 16, display: 'inline-block', marginTop: 16, marginLeft: 80 }}>
-          添加规格值
-        </a>
-      </Fragment>
+      <div className={styles.ruleSetBox}>
+        <Row>
+          <Col span={20} offset={4} className={styles.addRuleName}>
+            <label>规格名:</label>
+            {getFieldDecorator(`k${k}`)(<Input type="text" style={{ width: 'calc(100% - 120px)' }}></Input>)}
+          </Col>
+        </Row>
+        <Row style={{ marginTop: 24 }}>
+          <Col span={20} offset={4}>
+            <DynamicFieldSet count={k} form={this.props.form}></DynamicFieldSet>
+          </Col>
+        </Row>
+      </div>
     );
   }
 }
 
 let rKey = 0;
 @Form.create()
-class RulesSet extends React.Component {
+export default class App extends React.Component {
   state = {
     ruleKey: [],
     skus: []
   };
 
   add = () => {
-    this.setState({ ruleKey: this.state.ruleKey.concat(++rKey) });
+    const { ruleKey } = this.state;
+
+    this.setState({ ruleKey: ruleKey.concat(++rKey) });
   };
 
   remove = k => {
-    const { ruleKey } = this.state;
     --rKey;
-    console.log(rKey, ruleKey);
+    const { ruleKey } = this.state;
+
     this.setState({ ruleKey: ruleKey.filter(key => key != k) });
   };
 
-  getData = () => {
-    this.props.form.validateFields((err, value) => {
-      if (!err) {
-        console.log(value);
-      }
-    });
-  };
+  // getAllValues = val => {
+  //   const { skus } = this.state;
+  //   this.setState({
+  //     skus: skus.concat(val)
+  //   });
+  // };
+  handleSubmit = e => {
+    e.preventDefault();
 
-  getSeconVal = val => {
-    // {`v${rKey}`:val}
-    // this.setState({ skus: this.state.skus.concat() });
+    const value = this.props.form.getFieldsValue();
+    console.log('11');
+    console.log(value);
   };
 
   render() {
-    const { ruleKey } = this.state;
-    const { getFieldDecorator } = this.props.form;
+    const { ruleKey, skus } = this.state;
 
-    return (
-      <Fragment>
-        {ruleKey.map((k, index) => (
-          <Fragment key={k}>
-            <Row>
-              <Col span={8} offset={4} className={styles.addRuleName}>
-                <label>规格名:</label>
-                {getFieldDecorator(`k${k}`)(<Input type="text" style={{ width: 'calc(100% - 120px)' }}></Input>)}
-                <a onClick={() => this.remove(k)} style={{ marginLeft: 10 }}>
-                  删除
-                </a>
-              </Col>
-            </Row>
-            <Row>
-              <Col span={8} offset={4}>
-                <DynamicFieldSet count={k} form={this.props.form} onChage={() => this.getSeconVal(val)}></DynamicFieldSet>
-              </Col>
-            </Row>
-          </Fragment>
-        ))}
-        <Row gutter={12} style={{ marginBottom: 24 }}>
-          <Col span={8} offset={4}>
-            <Button type="dashed" disabled={ruleKey.length >= 3} onClick={this.add} style={{ marginLeft: 80 }}>
-              <Icon type="plus" /> 添加规格
-            </Button>
-          </Col>
-        </Row>
-      </Fragment>
-    );
-  }
-}
-
-export default class App extends React.Component {
-  render() {
     return (
       <div className={styles.ruleSet}>
         <h2 className="title">
           <span>添加规格</span>
         </h2>
-        <RulesSet></RulesSet>
+        <Form>
+          {ruleKey.map((k, index) => (
+            <div key={k} className={styles.ruleBox}>
+              <RulesSet form={this.props.form} k={k}></RulesSet>
+              <a onClick={() => this.remove(k)} style={{ marginLeft: 10 }}>
+                删除
+              </a>
+            </div>
+          ))}
+          <Row gutter={12} style={{ marginBottom: 24 }}>
+            <Col span={6} offset={4}>
+              <Button type="dashed" disabled={ruleKey.length >= 3} onClick={this.add} style={{ marginLeft: 80 }}>
+                <Icon type="plus" /> 添加规格
+              </Button>
+              <Button type="primary" onClick={this.handleSubmit} style={{ marginLeft: 10 }}>
+                确定
+              </Button>
+            </Col>
+          </Row>
+        </Form>
       </div>
     );
   }
